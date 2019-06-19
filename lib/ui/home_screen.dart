@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:retroshare/ui/person_delegate.dart';
+
 class _Page {
   _Page({this.label});
   final String label;
@@ -8,68 +10,43 @@ class _Page {
   String toString() => '$runtimeType("$label")';
 }
 
-class _CardData {
-  const _CardData({this.title});
-  final String title;
-}
-
-final Map<_Page, List<_CardData>> _allPages = <_Page, List<_CardData>>{
-  _Page(label: 'Chats'): <_CardData>[
-    const _CardData(
-      title: 'Sandie Gloop',
+final Map<_Page, List<PersonDelegateData>> _allPages =
+    <_Page, List<PersonDelegateData>>{
+  _Page(label: 'Chats'): <PersonDelegateData>[
+    const PersonDelegateData(
+      name: 'Sandie Gloop',
     ),
-    const _CardData(
-      title: 'May Doris Sparrow',
+    const PersonDelegateData(
+      name: 'May Doris Sparrow',
     ),
-    const _CardData(
-      title: 'Best room ever!',
+    const PersonDelegateData(
+      name: 'Best room ever!',
     ),
-    const _CardData(
-      title: 'Andrew Walker',
+    const PersonDelegateData(
+      name: 'Andrew Walker',
     ),
-    const _CardData(
-      title: 'Do you feel that vibe?',
+    const PersonDelegateData(
+      name: 'Do you feel that vibe?',
     ),
-    const _CardData(
-      title: 'Alison Platt',
+    const PersonDelegateData(
+      name: 'Alison Platt',
     ),
-    const _CardData(
-      title: 'Ocean Greenwald',
+    const PersonDelegateData(
+      name: 'Ocean Greenwald',
     ),
   ],
-  _Page(label: 'Friends'): <_CardData>[
-    const _CardData(
-      title: 'Alison Platt',
+  _Page(label: 'Friends'): <PersonDelegateData>[
+    const PersonDelegateData(
+      name: 'Alison Platt',
     ),
-    const _CardData(
-      title: 'Harriet Rabbit',
+    const PersonDelegateData(
+      name: 'Harriet Rabbit',
     ),
-    const _CardData(
-      title: 'Helen Parker',
+    const PersonDelegateData(
+      name: 'Helen Parker',
     ),
   ],
 };
-
-class _CardDataItem extends StatelessWidget {
-  const _CardDataItem({this.page, this.data});
-
-  static const double height = 100.0;
-  final _Page page;
-  final _CardData data;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.amber,
-      child: Center(
-        child: Text(
-          data.title,
-          style: Theme.of(context).textTheme.title,
-        ),
-      ),
-    );
-  }
-}
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -141,18 +118,13 @@ class _HomeScreenState extends State<HomeScreen>
                           horizontal: 16.0,
                         ),
                         sliver: SliverFixedExtentList(
-                          itemExtent: _CardDataItem.height,
+                          itemExtent: PersonDelegate.delegateHeight,
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
-                              final _CardData data = _allPages[page][index];
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                ),
-                                child: _CardDataItem(
-                                  page: page,
-                                  data: data,
-                                ),
+                              final PersonDelegateData data =
+                                  _allPages[page][index];
+                              return PersonDelegate(
+                                data: data,
                               );
                             },
                             childCount: _allPages[page].length,
