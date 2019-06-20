@@ -5,6 +5,7 @@ import 'package:retroshare/ui/home_screen.dart';
 import 'package:retroshare/ui/signin_screen.dart';
 import 'package:retroshare/ui/signup_screen.dart';
 import 'package:retroshare/ui/room_screen.dart';
+import 'package:retroshare/ui/create_room.dart';
 
 
 class RouteGenerator {
@@ -22,6 +23,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => SignUpScreen());
       case '/room':
         return MaterialPageRoute(builder: (_) => RoomScreen());
+      case '/create_room':
+        return MaterialPageRoute(builder: (_) => CreateRoomScreen());
       default:
         return _errorRoute();
     }
