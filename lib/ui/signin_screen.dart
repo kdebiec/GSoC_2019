@@ -28,7 +28,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           color: Color(0xFFF5F5F5),
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        height: 45,
+                        height: 40,
                         child: TextField(
                           decoration: InputDecoration(
                               border: InputBorder.none,
@@ -38,7 +38,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 size: 22.0,
                               ),
                               hintText: 'Login'),
-                          style: TextStyle(color: Color(0xFF9E9E9E)),
+                          style: Theme.of(context).textTheme.body2,
                         ),
                       ),
                     ),
@@ -51,7 +51,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           color: Color(0xFFF5F5F5),
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        height: 45,
+                        height: 40,
                         child: TextField(
                           decoration: InputDecoration(
                               border: InputBorder.none,
@@ -61,14 +61,15 @@ class _SignInScreenState extends State<SignInScreen> {
                                 size: 22.0,
                               ),
                               hintText: 'Password'),
-                          style: TextStyle(color: Color(0xFF9E9E9E)),
+                          style: Theme.of(context).textTheme.body2,
                         ),
                       ),
                     ),
                     const SizedBox(height: 30),
                     FlatButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/home');
+                        //Navigator.pushReplacementNamed(context, '/home');
+                        Navigator.pushNamed(context, '/home');
                       },
                       textColor: Colors.white,
                       padding: const EdgeInsets.all(0.0),
@@ -107,9 +108,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPressed: () {},
                       textColor: Color(0xFF9E9E9E),
                       padding: const EdgeInsets.all(0.0),
-                      child: const Text(
+                      child: Text(
                         'Import account',
-                        style: TextStyle(fontSize: 15),
+                        style: Theme.of(context).textTheme.body1,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -119,9 +120,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       },
                       textColor: Color(0xFF9E9E9E),
                       padding: const EdgeInsets.all(0.0),
-                      child: const Text(
+                      child: Text(
                         'Create account',
-                        style: TextStyle(fontSize: 15),
+                        style: Theme.of(context).textTheme.body1,
                         textAlign: TextAlign.center,
                       ),
                     ),
