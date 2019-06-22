@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+
+import 'dart:math' as math;
 
 import 'package:retroshare/ui/person_delegate.dart';
 
@@ -10,11 +13,117 @@ class _Page {
   String toString() => '$runtimeType("$label")';
 }
 
+const double _kAppBarMinHeight = 150.0;
+const double _kAppBarMidHeight = 256.0;
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate({
+    @required this.minHeight,
+    @required this.maxHeight,
+    @required this.child,
+  });
+
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+
+  @override
+  double get minExtent => minHeight;
+  @override
+  double get maxExtent => math.max(maxHeight, minHeight);
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
+  }
+
+  @override
+  String toString() => '_SliverAppBarDelegate';
+}
+
+class _SnappingScrollPhysics extends ClampingScrollPhysics {
+  const _SnappingScrollPhysics({
+    ScrollPhysics parent,
+    @required this.minScrollOffset,
+    @required this.midScrollOffset,
+  })  : assert(minScrollOffset != null), assert(midScrollOffset != null),
+        super(parent: parent);
+
+  final double minScrollOffset;
+  final double midScrollOffset;
+
+  @override
+  _SnappingScrollPhysics applyTo(ScrollPhysics ancestor) {
+    return _SnappingScrollPhysics(
+        parent: buildParent(ancestor), minScrollOffset: minScrollOffset, midScrollOffset: midScrollOffset);
+  }
+
+  Simulation _toZeroScrollOffsetSimulation(double offset, double dragVelocity) {
+    final double velocity = math.max(dragVelocity, minFlingVelocity);
+    return ScrollSpringSimulation(spring, offset, 0.0, velocity,
+        tolerance: tolerance);
+  }
+
+  Simulation _toMinScrollOffsetSimulation(double offset, double dragVelocity) {
+    final double velocity = math.max(dragVelocity, minFlingVelocity);
+    return ScrollSpringSimulation(spring, offset, minScrollOffset, velocity,
+        tolerance: tolerance);
+  }
+
+  @override
+  Simulation createBallisticSimulation(
+      ScrollMetrics position, double dragVelocity) {
+    final Simulation simulation = super.createBallisticSimulation(position, dragVelocity);
+    final double offset = position.pixels;
+
+    if (simulation != null) {
+      if (dragVelocity > 0.0)
+        return _toMinScrollOffsetSimulation(offset, dragVelocity);
+      if (dragVelocity < 0.0)
+        return _toZeroScrollOffsetSimulation(offset, dragVelocity);
+    }
+    else {
+      if (offset > 0.0 && offset < midScrollOffset)
+        return _toZeroScrollOffsetSimulation(offset, dragVelocity);
+
+      return _toMinScrollOffsetSimulation(offset, dragVelocity);
+    }
+
+    return simulation;
+  }
+}
+
 final Map<_Page, List<PersonDelegateData>> _allPages =
     <_Page, List<PersonDelegateData>>{
   _Page(label: 'Chats'): <PersonDelegateData>[
     const PersonDelegateData(
       name: 'Sandie Gloop',
+    ),
+    const PersonDelegateData(
+      name: 'May Doris Sparrow',
+    ),
+    const PersonDelegateData(
+      name: 'Best room ever!',
+    ),
+    const PersonDelegateData(
+      name: 'Andrew Walker',
+    ),
+    const PersonDelegateData(
+      name: 'Do you feel that vibe?',
+    ),
+    const PersonDelegateData(
+      name: 'Alison Platt',
+    ),
+    const PersonDelegateData(
+      name: 'Ocean Greenwald',
     ),
     const PersonDelegateData(
       name: 'May Doris Sparrow',
@@ -48,6 +157,54 @@ final Map<_Page, List<PersonDelegateData>> _allPages =
   ],
 };
 
+class SliverDelegateAnimated extends AnimatedWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return null;
+  }
+}
+
+class Button extends StatelessWidget {
+  const Button({this.name, this.buttonIcon});
+
+  final String name;
+  final IconData buttonIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Container(
+        height: 55,
+        child: Row(
+          children: <Widget>[
+            Container(
+              height: PersonDelegate.delegateHeight,
+              width: PersonDelegate.delegateHeight,
+              child: Center(
+                child: Icon(this.buttonIcon,
+                    color: Theme.of(context).textTheme.body2.color),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(this.name, style: Theme.of(context).textTheme.body2),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -58,12 +215,16 @@ class _HomeScreenState extends State<HomeScreen>
   TabController _tabController;
   int _selectedTab;
 
+  ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: _allPages.length);
     _tabController.addListener(_handleTabSelection);
     _selectedTab = _tabController.index;
+
+    _scrollController = ScrollController()..addListener(() => setState(() {}));
   }
 
   @override
@@ -78,21 +239,235 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
+  double get _getOffset {
+    if (_scrollController.hasClients) {
+      return _scrollController.offset;
+    } else
+      return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
+    final double statusBarHeight = mediaQueryData.padding.top;
+    final double screenHeight = mediaQueryData.size.height;
+    final double appBarMinHeight = _kAppBarMinHeight - statusBarHeight;
+    final double appBarMaxHeight = screenHeight - statusBarHeight;
+    final double appBarMidScrollOffset =
+        statusBarHeight + appBarMaxHeight - _kAppBarMidHeight;
+
+    double heightOfTopBar =  _getOffset == null ? appBarMinHeight : appBarMinHeight +
+        math.sin((math.pi/2)*((appBarMaxHeight*0.9-_getOffset)/appBarMaxHeight*0.9))*appBarMaxHeight * 0.15;
     return Scaffold(
       body: NestedScrollView(
+        controller: _scrollController,
+        physics: _SnappingScrollPhysics(
+            minScrollOffset: appBarMaxHeight, midScrollOffset: appBarMidScrollOffset*0.5),
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverOverlapAbsorber(
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              child: SliverAppBar(
-                title: Text(_allPages.keys.elementAt(_selectedTab).label,
-                    style: TextStyle(color: Colors.black)),
+              child: SliverPersistentHeader(
                 pinned: true,
-                expandedHeight: 150.0,
-                forceElevated: innerBoxIsScrolled,
-                backgroundColor: Colors.white,
+                delegate: _SliverAppBarDelegate(
+                  minHeight: _kAppBarMinHeight,
+                  maxHeight: appBarMaxHeight * 0.9,
+                  child: Container(
+                    color: Colors.white,
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: statusBarHeight,
+                        ),
+                        Expanded(
+                          child: Stack(
+                            children: <Widget>[
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Container(
+                                          height: 1,
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _getOffset == null
+                                            ? false
+                                            : _getOffset <
+                                                appBarMaxHeight * 0.2,
+                                        child: Button(
+                                            name: 'Create new identity',
+                                            buttonIcon: Icons.add),
+                                      ),
+                                      Visibility(
+                                        visible: _getOffset == null
+                                            ? false
+                                            : _getOffset <
+                                                appBarMaxHeight * 0.3,
+                                        child: Button(
+                                            name: 'Delete identity',
+                                            buttonIcon: Icons.delete),
+                                      ),
+                                      Visibility(
+                                        visible: _getOffset == null
+                                            ? false
+                                            : _getOffset <
+                                                appBarMaxHeight * 0.4,
+                                        child: Button(
+                                            name: 'Options',
+                                            buttonIcon: Icons.settings),
+                                      ),
+                                      Visibility(
+                                        visible: _getOffset == null
+                                            ? false
+                                            : _getOffset <
+                                                appBarMaxHeight * 0.5,
+                                        child: Button(
+                                            name: 'About',
+                                            buttonIcon: Icons.info),
+                                      ),
+                                      Visibility(
+                                        visible: _getOffset == null
+                                            ? false
+                                            : _getOffset <
+                                                appBarMaxHeight * 0.6,
+                                        child: Button(
+                                            name: 'Log out',
+                                            buttonIcon: Icons.exit_to_app),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                color: Colors.white,
+                                height: heightOfTopBar,
+                                child: Center(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              flex: 3,
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16.0),
+                                                child: Text(
+                                                    _allPages.keys
+                                                        .elementAt(_selectedTab)
+                                                        .label,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .title),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Center(
+                                                child: Container(
+                                                  width: (heightOfTopBar - 40)*0.6,
+                                                  height:
+                                                      (heightOfTopBar - 40)*0.6,
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        Colors.lightBlueAccent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            (heightOfTopBar -
+                                                                    40) *
+                                                                0.8 *
+                                                                0.5
+                                                            /*(_kAppBarMinHeight -
+                                                                    40 -
+                                                                    statusBarHeight) *
+                                                                0.8 *
+                                                                0.5*/
+                                                            ),
+                                                    image: DecorationImage(
+                                                      fit: BoxFit.fitWidth,
+                                                      image: AssetImage(
+                                                          'assets/profile.jpg'),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 3,
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16.0),
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Icon(Icons.unfold_more,
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .body2
+                                                          .color),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            color: Color(0xFFF5F5F5),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15),
+                                          height: 40,
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Row(
+                                              children: <Widget>[
+                                                Icon(Icons.search,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .body1
+                                                        .color),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Expanded(
+                                                  child: TextField(
+                                                    decoration: InputDecoration(
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText:
+                                                            'Type text...'),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .body2,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ];
@@ -113,10 +488,8 @@ class _HomeScreenState extends State<HomeScreen>
                             context),
                       ),
                       SliverPadding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                          horizontal: 16.0,
-                        ),
+                        padding: const EdgeInsets.only(
+                            left: 8, top: 8, right: 16, bottom: 8),
                         sliver: SliverFixedExtentList(
                           itemExtent: PersonDelegate.delegateHeight,
                           delegate: SliverChildBuilderDelegate(
@@ -125,6 +498,9 @@ class _HomeScreenState extends State<HomeScreen>
                                   _allPages[page][index];
                               return PersonDelegate(
                                 data: data,
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/room');
+                                },
                               );
                             },
                             childCount: _allPages[page].length,
@@ -200,7 +576,9 @@ class _HomeScreenState extends State<HomeScreen>
         width: 60,
         child: FittedBox(
           child: FloatingActionButton(
-            onPressed: () => setState(() {}),
+            onPressed: () {
+              Navigator.pushNamed(context, '/create_room');
+            },
             child: Icon(Icons.add, size: 35),
             backgroundColor: Colors.lightBlueAccent,
           ),
