@@ -157,14 +157,6 @@ final Map<_Page, List<PersonDelegateData>> _allPages =
   ],
 };
 
-class SliverDelegateAnimated extends AnimatedWidget {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return null;
-  }
-}
-
 class Button extends StatelessWidget {
   const Button({this.name, this.buttonIcon});
 
@@ -224,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.addListener(_handleTabSelection);
     _selectedTab = _tabController.index;
 
-    _scrollController = ScrollController()..addListener(() => setState(() {}));
+    _scrollController = ScrollController(initialScrollOffset: 500)..addListener(() => setState(() {}));
   }
 
   @override
@@ -370,9 +362,9 @@ class _HomeScreenState extends State<HomeScreen>
                                               flex: 4,
                                               child: Center(
                                                 child: Container(
-                                                  width: (heightOfTopBar - 40)*0.6,
+                                                  width: (heightOfTopBar-40)*0.65,
                                                   height:
-                                                      (heightOfTopBar - 40)*0.6,
+                                                      (heightOfTopBar-40)*0.65,
                                                   decoration: BoxDecoration(
                                                     color:
                                                         Colors.lightBlueAccent,
