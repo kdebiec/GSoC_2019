@@ -19,7 +19,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset('assets/rs-logo.png', height: 250, width: 250),
+                    Hero(
+                      tag: 'logo',
+                      child: Image.asset('assets/rs-logo.png',
+                          height: 250, width: 250),
+                    ),
                     SizedBox(
                       width: double.infinity,
                       child: Container(
