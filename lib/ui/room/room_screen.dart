@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:retroshare/ui/message_delegate.dart';
+import 'package:retroshare/ui/room/message_delegate.dart';
+import 'package:retroshare/ui/person_delegate.dart';
 
 final List<MessageDelegateData> messageData = [
   const MessageDelegateData(
@@ -13,7 +14,6 @@ final List<MessageDelegateData> messageData = [
       isSent: false,
       message:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
-
   const MessageDelegateData(
       name: 'Helen Parker',
       isSent: true,
@@ -37,22 +37,23 @@ class _RoomScreenState extends State<RoomScreen> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 8.0),
+          Container(
+            height: appBarHeight + 32 + 8,
+            padding: const EdgeInsets.fromLTRB(8.0, 32.0, 16.0, 8.0),
             child: Row(
               children: <Widget>[
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    size: 25,
+                Container(
+                  width: PersonDelegate.delegateHeight,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      size: 25,
+                    ),
+                    color: Color(0xFF9E9E9E),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                  color: Color(0xFF9E9E9E),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                SizedBox(
-                  width: 15,
                 ),
                 Container(
                   width: appBarHeight,
@@ -99,10 +100,12 @@ class _RoomScreenState extends State<RoomScreen> {
                   ),
                 ),
                 SizedBox(width: 10.0),
-                Text(
-                  name,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                )
+                Expanded(
+                  child: Text(
+                    name,
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+                ),
               ],
             ),
           ),
@@ -153,7 +156,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       color: Color(0xFFF5F5F5),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 15),
-                    height: 50,
+                    height: 40,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Row(
@@ -163,7 +166,7 @@ class _RoomScreenState extends State<RoomScreen> {
                               decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Type text...'),
-                              style: TextStyle(color: Color(0xFF9E9E9E)),
+                              style: Theme.of(context).textTheme.body2,
                             ),
                           ),
                           IconButton(
