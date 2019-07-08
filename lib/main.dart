@@ -13,37 +13,16 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    return OKToast (
-      child: MaterialApp (
+    return OKToast(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Retroshare',
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          iconTheme: IconThemeData(color: Colors.black12),
         ),
-
         initialRoute: '/',
         onGenerateRoute: RouteGenerator.generateRoute,
-      ),
-    );
-  }
-}
-
-class SplashScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/signin');
-        },
-        child: Center(
-          child: Hero(
-            tag: 'logo',
-            child: Image.asset(
-              'assets/rs-logo.png',
-            ),
-          ),
-        ),
       ),
     );
   }

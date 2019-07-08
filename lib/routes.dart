@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:retroshare/main.dart';
+import 'package:retroshare/ui/splash_screen.dart';
 import 'package:retroshare/ui/home_screen.dart';
 import 'package:retroshare/ui/signin_screen.dart';
 import 'package:retroshare/ui/signup_screen.dart';
