@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -6,6 +8,11 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  TextEditingController usernameController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
+  TextEditingController repeatPasswordController = new TextEditingController();
+  TextEditingController nodeNameController = new TextEditingController();
+
   bool advancedOption;
 
   @override
@@ -18,12 +25,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Center(
-          child: SizedBox(
+      body: Center(
+        child: SingleChildScrollView(
+        child:SizedBox(
             width: 300,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Hero(
                   tag: 'logo',
@@ -40,6 +47,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     height: 40,
                     child: TextField(
+                      controller: usernameController,
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           icon: Icon(
@@ -47,7 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             color: Color(0xFF9E9E9E),
                             size: 22.0,
                           ),
-                          hintText: 'Login'),
+                          hintText: 'Username'),
                       style: Theme.of(context).textTheme.body2,
                     ),
                   ),
@@ -63,6 +71,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     height: 40,
                     child: TextField(
+                      controller: passwordController,
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           icon: Icon(
@@ -86,6 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     height: 40,
                     child: TextField(
+                      controller: repeatPasswordController,
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           icon: Icon(
@@ -150,14 +160,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       height: 40,
                       child: TextField(
+                        controller: nodeNameController,
                         decoration: InputDecoration(
-                            border: InputBorder.none,
-                            icon: Icon(
-                              Icons.smartphone,
-                              color: Color(0xFF9E9E9E),
-                              size: 22.0,
-                            ),
-                            hintText: 'Node name'),
+                          border: InputBorder.none,
+                          icon: Icon(
+                            Icons.smartphone,
+                            color: Color(0xFF9E9E9E),
+                            size: 22.0,
+                          ),
+                          hintText: 'Node name',
+                        ),
                         style: Theme.of(context).textTheme.body2,
                       ),
                     ),
@@ -181,7 +193,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: Row(
                           children: <Widget>[
                             Checkbox(
-                              value: true,
+                              value: false,
                             ),
                             SizedBox(width: 3),
                             Text(
@@ -195,7 +207,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 20),
                 FlatButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/home');
+                    if (nodeNameController.text == '')
+                      createAccount(
+                          context,
+                          usernameController.text,
+                          passwordController.text,
+                          repeatPasswordController.text);
+                    else
+                      createAccount(
+                          context,
+                          usernameController.text,
+                          passwordController.text,
+                          repeatPasswordController.text,
+                          nodeNameController.text);
                   },
                   textColor: Colors.white,
                   padding: const EdgeInsets.all(0.0),
@@ -229,5 +253,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+}
+
+void createAccount(BuildContext context, String username, String password,
+    String repeatPassword,
+    [String nodeName = 'Mobile']) async {
+  if (password != repeatPassword) return; // Should notify user
+
+  var accountDetails = {
+    'location': {
+      "mPpgName": username,
+      "mLocationName": nodeName,
+    },
+    'password': password,
+  };
+  final response = await http.post(
+      'http://localhost:9092/rsLoginHelper/createLocation',
+      body: json.encode(accountDetails));
+
+  if (response.statusCode == 200) {
+    if (json.decode(response.body)['retval'])
+      Navigator.pushReplacementNamed(context, '/home');
+  } else {
+    throw Exception('Failed to load response');
   }
 }
