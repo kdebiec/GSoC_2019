@@ -40,6 +40,9 @@ void checkBackendState(BuildContext context) async {
     accountsList = await getLocations();
     Navigator.pushReplacementNamed(context, '/signin');
   }
+
+  // Jeśli nie ma żadnych kont daj uzytkownikowi wybor miedzy importowaniem konta
+  // a stworzeniem nowego!!!
 }
 
 dynamic checkLoggedIn() async {
@@ -62,11 +65,41 @@ Future<List<Account>> getLocations() async {
     List<Account> accountsList = new List();
     json.decode(response.body)['locations'].forEach((location) {
       if (location != null)
-        accountsList.add(Account(location['mLocationId'], location['mPgpId'],
-            location['mLocationName'], location['mPpgName']));
+        accountsList.add(
+            Account(
+                location['mLocationId'],
+                location['mPgpId'],
+                location['mLocationName'],
+                location['mPpgName']));
     });
 
     return accountsList;
   } else
     throw Exception('Failed to load response');
 }
+
+/*dynamic checkTokenAuth() async {
+  if (authToken == null) {
+    var token = {
+      'token': '55bdef27fc9f7c46decdf637ab2e812f:password',
+    };
+    final response = await http.post(
+        'http://localhost:9092/jsonApiServer/requestNewTokenAutorization',
+        body: json.encode(token));
+
+    //var uri = Uri.http('localhost:9092', 'jsonApiServer/requestNewTokenAutorization', token);
+
+    //final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON.
+      print('tokenAuth' + response.body);
+      return json.decode(response.body)['retval'];
+      //return json.decode(response.body);
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception('Failed to load post');
+    }
+  } else
+    return true;
+}*/

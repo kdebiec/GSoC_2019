@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
+
 
 import 'package:retroshare/model/location.dart';
 
@@ -10,9 +12,11 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   List<DropdownMenuItem<Account>> accountsDropdown;
   Account currentAccount;
+  bool hideLocations;
 
   @override
   void initState() {
+    hideLocations = true;
     accountsDropdown = getDropDownMenuItems();
     currentAccount = accountsDropdown[0].value;
     super.initState();
@@ -21,9 +25,18 @@ class _SignInScreenState extends State<SignInScreen> {
   List<DropdownMenuItem<Account>> getDropDownMenuItems() {
     List<DropdownMenuItem<Account>> items = new List();
     for (Account account in accountsList) {
-      items.add(new DropdownMenuItem(
-          value: account,
-          child: new Text(account.pgpName + ':' + account.locationName)));
+      items.add(DropdownMenuItem(
+        value: account,
+        child: Row(
+          children: <Widget>[
+            Text(account.pgpName),
+            Visibility(
+              visible: !hideLocations,
+              child: Text(':' + account.locationName),
+            )
+          ],
+        ),
+      ));
     }
     return items;
   }
@@ -32,6 +45,17 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() {
       currentAccount = selectedAccount;
     });
+  }
+
+  void revealLocations() {
+    if (hideLocations) {
+      setState(() {
+        hideLocations = false;
+        accountsDropdown = getDropDownMenuItems();
+      });
+
+      showToast('Locations revealed');
+    }
   }
 
   @override
@@ -61,28 +85,33 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         height: 40,
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.person_outline,
-                              color: Color(0xFF9E9E9E),
-                              size: 22.0,
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton(
-                                  value: currentAccount,
-                                  items: accountsDropdown,
-                                  onChanged: changedDropDownItem,
-                                  style: Theme.of(context).textTheme.body2,
-                                  disabledHint: Text('Login'),
+                        child: GestureDetector(
+                          onLongPress: () {
+                            revealLocations();
+                          },
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.person_outline,
+                                color: Color(0xFF9E9E9E),
+                                size: 22.0,
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Expanded(
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton(
+                                    value: currentAccount,
+                                    items: accountsDropdown,
+                                    onChanged: changedDropDownItem,
+                                    style: Theme.of(context).textTheme.body2,
+                                    disabledHint: Text('Login'),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
