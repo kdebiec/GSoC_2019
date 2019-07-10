@@ -3,6 +3,8 @@ import 'package:flutter/rendering.dart';
 
 import 'dart:math' as math;
 
+import 'package:retroshare/common/button.dart';
+import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/ui/person_delegate.dart';
 
 class _Page {
@@ -156,46 +158,6 @@ final Map<_Page, List<PersonDelegateData>> _allPages =
     ),
   ],
 };
-
-class Button extends StatelessWidget {
-  const Button({this.name, this.buttonIcon});
-
-  final String name;
-  final IconData buttonIcon;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        height: 55,
-        child: Row(
-          children: <Widget>[
-            Container(
-              height: PersonDelegate.delegateHeight,
-              width: PersonDelegate.delegateHeight,
-              child: Center(
-                child: Icon(this.buttonIcon,
-                    color: Theme.of(context).textTheme.body2.color),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(this.name, style: Theme.of(context).textTheme.body2),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -483,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen>
                         padding: const EdgeInsets.only(
                             left: 8, top: 8, right: 16, bottom: 8),
                         sliver: SliverFixedExtentList(
-                          itemExtent: PersonDelegate.delegateHeight,
+                          itemExtent: personDelegateHeight,
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               final PersonDelegateData data =
@@ -510,6 +472,7 @@ class _HomeScreenState extends State<HomeScreen>
       bottomNavigationBar: BottomAppBar(
         child: Container(
           height: 50,
+
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -571,7 +534,7 @@ class _HomeScreenState extends State<HomeScreen>
             onPressed: () {
               Navigator.pushNamed(context, '/create_room');
             },
-            child: Icon(Icons.add, size: 35),
+            child: Icon(Icons.add, size: 35, color: Colors.white,),
             backgroundColor: Colors.lightBlueAccent,
           ),
         ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:retroshare/ui/room/message_delegate.dart';
-import 'package:retroshare/ui/person_delegate.dart';
+import 'package:retroshare/common/styles.dart';
 
 final List<MessageDelegateData> messageData = [
   const MessageDelegateData(
@@ -43,7 +43,7 @@ class _RoomScreenState extends State<RoomScreen> {
             child: Row(
               children: <Widget>[
                 Container(
-                  width: PersonDelegate.delegateHeight,
+                  width: personDelegateHeight,
                   child: IconButton(
                     icon: Icon(
                       Icons.arrow_back,

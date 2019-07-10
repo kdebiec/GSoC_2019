@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/ui/person_delegate.dart';
 
 final List<PersonDelegateData> personData = [
@@ -51,8 +52,8 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             child: Row(
               children: <Widget>[
                 SizedBox(
-                  height: PersonDelegate.delegateHeight,
-                  width: PersonDelegate.delegateHeight,
+                  height: personDelegateHeight,
+                  width: personDelegateHeight,
                   child: IconButton(
                     icon: Icon(
                       Icons.arrow_back,
@@ -114,12 +115,12 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                 if (index == 0) {
                   return GestureDetector(
                     child: Container(
-                      height: PersonDelegate.delegateHeight,
+                      height: personDelegateHeight,
                       child: Row(
                         children: <Widget>[
                           Container(
-                            height: PersonDelegate.delegateHeight,
-                            width: PersonDelegate.delegateHeight,
+                            height: personDelegateHeight,
+                            width: personDelegateHeight,
                             child: Center(
                               child: Icon(Icons.add,
                                   color:

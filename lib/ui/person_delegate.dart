@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:retroshare/common/styles.dart';
+
 class PersonDelegateData {
   const PersonDelegateData(
       {this.name,
@@ -21,7 +23,7 @@ class PersonDelegateData {
 class PersonDelegate extends StatelessWidget {
   const PersonDelegate({this.data});
 
-  static const double delegateHeight = 86.0;
+  final double delegateHeight = personDelegateHeight;
   static const double width = 100.0;
   final PersonDelegateData data;
 
@@ -55,7 +57,7 @@ class PersonDelegate extends StatelessWidget {
                             colors: [
                               Color(0xFF00FFFF),
                               Color(0xFF29ABE2),
-                            ], // whitish to gray
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(
                               delegateHeight * 0.92 * 0.33),
