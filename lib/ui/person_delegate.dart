@@ -21,17 +21,19 @@ class PersonDelegateData {
 }
 
 class PersonDelegate extends StatelessWidget {
-  const PersonDelegate({this.data});
+  const PersonDelegate({this.data, this.onPressed});
 
   final double delegateHeight = personDelegateHeight;
   static const double width = 100.0;
   final PersonDelegateData data;
+  final Function onPressed;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/room');
+        if(onPressed != null)
+          onPressed();
       },
       child: Container(
         height: delegateHeight,
