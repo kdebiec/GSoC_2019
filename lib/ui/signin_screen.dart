@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'package:retroshare/model/location.dart';
 
@@ -10,6 +12,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  TextEditingController passwordController = new TextEditingController();
+
   List<DropdownMenuItem<Account>> accountsDropdown;
   Account currentAccount;
   bool hideLocations;
@@ -56,6 +60,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
       showToast('Locations revealed');
     }
+  }
+
+  void attemptLogIn() async {
+    int resp = await requestLogIn(currentAccount, passwordController.text);
+    if (resp == 0) Navigator.pushReplacementNamed(context, '/home');
+    //else if(resp == 3) Wrong password
   }
 
   @override
@@ -126,6 +136,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         height: 40,
                         child: TextField(
+                          controller: passwordController,
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               icon: Icon(
@@ -141,8 +152,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 30),
                     FlatButton(
                       onPressed: () {
-                        //Navigator.pushReplacementNamed(context, '/home');
-                        Navigator.pushNamed(context, '/home');
+                        attemptLogIn();
                       },
                       textColor: Colors.white,
                       padding: const EdgeInsets.all(0.0),
@@ -208,5 +218,23 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ),
     );
+  }
+}
+
+dynamic requestLogIn(Account selectedAccount, String password) async {
+  var accountDetails = {
+    'account': selectedAccount.locationId,
+    'password': password
+  };
+
+  final response = await http.post(
+      'http://localhost:9092/rsLoginHelper/attemptLogin',
+      body: json.encode(accountDetails));
+
+  if (response.statusCode == 200) {
+    print('login' + response.body);
+    return json.decode(response.body)['retval']; // == 0
+  } else {
+    throw Exception('Failed to load response');
   }
 }
