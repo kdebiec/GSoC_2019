@@ -3,15 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:retroshare/common/styles.dart';
 
 class Button extends StatelessWidget {
-  const Button({this.name, this.buttonIcon});
+  const Button({this.name, this.buttonIcon, this.onPressed});
 
   final String name;
   final IconData buttonIcon;
+  final Function onPressed;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        if(onPressed != null)
+          onPressed();
+      },
       child: Container(
+        color: Colors.white,
         height: buttonHeight,
         child: Row(
           children: <Widget>[
