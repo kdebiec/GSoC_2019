@@ -336,9 +336,6 @@ class _HomeScreenState extends State<HomeScreen>
                                                                     40) *
                                                                 0.8 *
                                                                 0.5
-                                                            /*(_kAppBarMinHeight -
-                                                                    40 -
-                                                                    statusBarHeight) *
                                                                 0.8 *
                                                                 0.5*/
                                                             ),
