@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/model/location.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,6 +20,8 @@ class _SplashState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Center(
         child: Hero(

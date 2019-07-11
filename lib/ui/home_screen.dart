@@ -56,7 +56,8 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
     ScrollPhysics parent,
     @required this.minScrollOffset,
     @required this.midScrollOffset,
-  })  : assert(minScrollOffset != null), assert(midScrollOffset != null),
+  })  : assert(minScrollOffset != null),
+        assert(midScrollOffset != null),
         super(parent: parent);
 
   final double minScrollOffset;
@@ -65,7 +66,9 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
   @override
   _SnappingScrollPhysics applyTo(ScrollPhysics ancestor) {
     return _SnappingScrollPhysics(
-        parent: buildParent(ancestor), minScrollOffset: minScrollOffset, midScrollOffset: midScrollOffset);
+        parent: buildParent(ancestor),
+        minScrollOffset: minScrollOffset,
+        midScrollOffset: midScrollOffset);
   }
 
   Simulation _toZeroScrollOffsetSimulation(double offset, double dragVelocity) {
@@ -83,7 +86,8 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
   @override
   Simulation createBallisticSimulation(
       ScrollMetrics position, double dragVelocity) {
-    final Simulation simulation = super.createBallisticSimulation(position, dragVelocity);
+    final Simulation simulation =
+        super.createBallisticSimulation(position, dragVelocity);
     final double offset = position.pixels;
 
     if (simulation != null) {
@@ -91,8 +95,7 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
         return _toMinScrollOffsetSimulation(offset, dragVelocity);
       if (dragVelocity < 0.0)
         return _toZeroScrollOffsetSimulation(offset, dragVelocity);
-    }
-    else {
+    } else {
       if (offset > 0.0 && offset < midScrollOffset)
         return _toZeroScrollOffsetSimulation(offset, dragVelocity);
 
@@ -178,7 +181,9 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.addListener(_handleTabSelection);
     _selectedTab = _tabController.index;
 
-    _scrollController = ScrollController(initialScrollOffset: 500)..addListener(() => setState(() {}));
+    _scrollController =
+        ScrollController(initialScrollOffset: screenHeight - _kAppBarMinHeight)
+          ..addListener(() => setState(() {}));
   }
 
   @override
@@ -206,17 +211,27 @@ class _HomeScreenState extends State<HomeScreen>
     final double statusBarHeight = mediaQueryData.padding.top;
     final double screenHeight = mediaQueryData.size.height;
     final double appBarMinHeight = _kAppBarMinHeight - statusBarHeight;
-    final double appBarMaxHeight = screenHeight - statusBarHeight;
+    final double appBarMaxHeight = appBarMinHeight +
+        (screenHeight - statusBarHeight) * 0.15 +
+        5 * buttonHeight;
     final double appBarMidScrollOffset =
         statusBarHeight + appBarMaxHeight - _kAppBarMidHeight;
 
-    double heightOfTopBar =  _getOffset == null ? appBarMinHeight : appBarMinHeight +
-        math.sin((math.pi/2)*((appBarMaxHeight*0.9-_getOffset)/appBarMaxHeight*0.9))*appBarMaxHeight * 0.15;
+    double heightOfTopBar = _getOffset == null
+        ? appBarMinHeight
+        : appBarMinHeight +
+            math.sin((math.pi / 2) *
+                    ((appBarMaxHeight * 0.9 - _getOffset) /
+                        appBarMaxHeight *
+                        0.9)) *
+                appBarMaxHeight *
+                0.15;
     return Scaffold(
       body: NestedScrollView(
         controller: _scrollController,
         physics: _SnappingScrollPhysics(
-            minScrollOffset: appBarMaxHeight, midScrollOffset: appBarMidScrollOffset*0.5),
+            minScrollOffset: appBarMaxHeight,
+            midScrollOffset: appBarMidScrollOffset * 0.5),
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverOverlapAbsorber(
@@ -225,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen>
                 pinned: true,
                 delegate: _SliverAppBarDelegate(
                   minHeight: _kAppBarMinHeight,
-                  maxHeight: appBarMaxHeight * 0.9,
+                  maxHeight: appBarMaxHeight,
                   child: Container(
                     color: Colors.white,
                     child: Column(
@@ -255,7 +270,10 @@ class _HomeScreenState extends State<HomeScreen>
                                                 appBarMaxHeight * 0.2,
                                         child: Button(
                                             name: 'Create new identity',
-                                            buttonIcon: Icons.add),
+                                            buttonIcon: Icons.add,
+                                            onPressed: () {
+                                              print('hello');
+                                            }),
                                       ),
                                       Visibility(
                                         visible: _getOffset == null
@@ -324,9 +342,11 @@ class _HomeScreenState extends State<HomeScreen>
                                               flex: 4,
                                               child: Center(
                                                 child: Container(
-                                                  width: (heightOfTopBar-40)*0.65,
+                                                  width: (heightOfTopBar - 40) *
+                                                      0.65,
                                                   height:
-                                                      (heightOfTopBar-40)*0.65,
+                                                      (heightOfTopBar - 40) *
+                                                          0.65,
                                                   decoration: BoxDecoration(
                                                     color:
                                                         Colors.lightBlueAccent,
@@ -335,10 +355,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                             (heightOfTopBar -
                                                                     40) *
                                                                 0.8 *
-                                                                0.5
-                                                                0.8 *
-                                                                0.5*/
-                                                            ),
+                                                                0.5),
                                                     image: DecorationImage(
                                                       fit: BoxFit.fitWidth,
                                                       image: AssetImage(
@@ -469,7 +486,6 @@ class _HomeScreenState extends State<HomeScreen>
       bottomNavigationBar: BottomAppBar(
         child: Container(
           height: 50,
-
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -531,7 +547,11 @@ class _HomeScreenState extends State<HomeScreen>
             onPressed: () {
               Navigator.pushNamed(context, '/create_room');
             },
-            child: Icon(Icons.add, size: 35, color: Colors.white,),
+            child: Icon(
+              Icons.add,
+              size: 35,
+              color: Colors.white,
+            ),
             backgroundColor: Colors.lightBlueAccent,
           ),
         ),
