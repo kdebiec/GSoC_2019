@@ -11,27 +11,33 @@ class SignInScreen extends StatefulWidget {
   _SignInScreenState createState() => _SignInScreenState();
 }
 
-void attemptLogIn(BuildContext context, Account currentAccount, String password) async {
-  Navigator.pushNamed(context, '/', arguments: true);
-  int resp = await requestLogIn(currentAccount, password);
-  Navigator.pop(context);
-  if (resp == 0) Navigator.pushReplacementNamed(context, '/home');
-  //else if(resp == 3) Wrong password
-}
-
 class _SignInScreenState extends State<SignInScreen> {
   TextEditingController passwordController = new TextEditingController();
 
   List<DropdownMenuItem<Account>> accountsDropdown;
   Account currentAccount;
   bool hideLocations;
+  bool wrongPassword;
 
   @override
   void initState() {
     hideLocations = true;
+    wrongPassword = false;
     accountsDropdown = getDropDownMenuItems();
     currentAccount = accountsDropdown[0].value;
     super.initState();
+  }
+
+  void attemptLogIn(Account currentAccount, String password) async {
+    Navigator.pushNamed(context, '/', arguments: true);
+    int resp = await requestLogIn(currentAccount, password);
+    Navigator.pop(context);
+    if (resp == 0)
+      Navigator.pushReplacementNamed(context, '/home');
+    else if (resp == 3)
+      setState(() {
+        wrongPassword = true;
+      });
   }
 
   List<DropdownMenuItem<Account>> getDropDownMenuItems() {
@@ -151,10 +157,36 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    Visibility(
+                      visible: wrongPassword,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Row(
+                          children: <Widget>[
+                            SizedBox(
+                              width: 52,
+                            ),
+                            Container(
+                              height: 25,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  'Wrong password',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: wrongPassword ? 10 : 30),
                     FlatButton(
                       onPressed: () {
-                        attemptLogIn(context, currentAccount, passwordController.text);
+                        attemptLogIn(currentAccount, passwordController.text);
                       },
                       textColor: Colors.white,
                       padding: const EdgeInsets.all(0.0),

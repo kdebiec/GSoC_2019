@@ -7,6 +7,8 @@ class SignUpScreen extends StatefulWidget {
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
+enum PasswordError { correct, notTheSame, tooShort }
+
 class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController usernameController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
@@ -14,11 +16,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nodeNameController = new TextEditingController();
 
   bool advancedOption;
+  bool isUsernameCorrect;
+  PasswordError passwordError;
 
   @override
   void initState() {
     super.initState();
     advancedOption = false;
+    isUsernameCorrect = true;
+    passwordError = PasswordError.correct;
+  }
+
+  void createAccount() {
+    bool success = true;
+    if (usernameController.text.length <= 3) {
+      setState(() {
+        isUsernameCorrect = false;
+      });
+      success = false;
+    }
+    if (passwordController.text != repeatPasswordController.text) {
+      setState(() {
+        passwordError = PasswordError.notTheSame;
+      });
+      success = false;
+    }
+    if (passwordController.text.length <= 3) {
+      setState(() {
+        passwordError = PasswordError.tooShort;
+      });
+      success = false;
+    }
+
+    if (!success) return;
+
+    if (nodeNameController.text == '')
+      requestAccountCreation(
+          context, usernameController.text, passwordController.text);
+    else
+      requestAccountCreation(context, usernameController.text,
+          passwordController.text, nodeNameController.text);
   }
 
   @override
@@ -27,10 +64,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
-        child:SizedBox(
+          child: SizedBox(
             width: 300,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Hero(
                   tag: 'logo',
@@ -60,7 +97,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                Visibility(
+                  visible: !isUsernameCorrect,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 52,
+                        ),
+                        Container(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Username is too short',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: isUsernameCorrect,
+                  child: const SizedBox(height: 10),
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: Container(
@@ -84,7 +150,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                Visibility(
+                  visible: passwordError == PasswordError.tooShort,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 52,
+                        ),
+                        Container(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Password is too short',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: passwordError != PasswordError.tooShort,
+                  child: const SizedBox(height: 10),
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: Container(
@@ -108,7 +203,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                Visibility(
+                  visible: passwordError == PasswordError.notTheSame,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 52,
+                        ),
+                        Container(
+                          height: 25,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Passwords do not match',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: passwordError != PasswordError.notTheSame,
+                  child: const SizedBox(height: 10),
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: GestureDetector(
@@ -207,19 +331,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 20),
                 FlatButton(
                   onPressed: () {
-                    if (nodeNameController.text == '')
-                      createAccount(
-                          context,
-                          usernameController.text,
-                          passwordController.text,
-                          repeatPasswordController.text);
-                    else
-                      createAccount(
-                          context,
-                          usernameController.text,
-                          passwordController.text,
-                          repeatPasswordController.text,
-                          nodeNameController.text);
+                    createAccount();
                   },
                   textColor: Colors.white,
                   padding: const EdgeInsets.all(0.0),
@@ -256,13 +368,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-void createAccount(BuildContext context, String username, String password,
-    String repeatPassword,
+void requestAccountCreation(
+    BuildContext context, String username, String password,
     [String nodeName = 'Mobile']) async {
-  if (password != repeatPassword) return; // Should notify user
-
   Navigator.pushNamed(context, '/', arguments: true);
-  
+
   var accountDetails = {
     'location': {
       "mPpgName": username,
