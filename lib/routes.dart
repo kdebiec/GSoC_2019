@@ -7,13 +7,16 @@ import 'package:retroshare/ui/signup_screen.dart';
 import 'package:retroshare/ui/room/room_screen.dart';
 import 'package:retroshare/ui/create_room.dart';
 
-
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
 
     switch (settings.name) {
       case '/':
+        if (args is bool)
+          return MaterialPageRoute(
+              builder: (_) => SplashScreen(isLoading: args));
+
         return MaterialPageRoute(builder: (_) => SplashScreen());
       case '/home':
         return MaterialPageRoute(builder: (_) => HomeScreen());
@@ -31,17 +34,15 @@ class RouteGenerator {
   }
 
   static Route<dynamic> _errorRoute() {
-    return MaterialPageRoute(
-      builder: (_) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Error'),
-          ),
-          body: Center(
-            child: Text('Error'),
-          ),
-        );
-      }
-    );
+    return MaterialPageRoute(builder: (_) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Error'),
+        ),
+        body: Center(
+          child: Text('Error'),
+        ),
+      );
+    });
   }
 }

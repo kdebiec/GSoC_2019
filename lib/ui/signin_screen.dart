@@ -11,6 +11,14 @@ class SignInScreen extends StatefulWidget {
   _SignInScreenState createState() => _SignInScreenState();
 }
 
+void attemptLogIn(BuildContext context, Account currentAccount, String password) async {
+  Navigator.pushNamed(context, '/', arguments: true);
+  int resp = await requestLogIn(currentAccount, password);
+  Navigator.pop(context);
+  if (resp == 0) Navigator.pushReplacementNamed(context, '/home');
+  //else if(resp == 3) Wrong password
+}
+
 class _SignInScreenState extends State<SignInScreen> {
   TextEditingController passwordController = new TextEditingController();
 
@@ -60,12 +68,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
       showToast('Locations revealed');
     }
-  }
-
-  void attemptLogIn() async {
-    int resp = await requestLogIn(currentAccount, passwordController.text);
-    if (resp == 0) Navigator.pushReplacementNamed(context, '/home');
-    //else if(resp == 3) Wrong password
   }
 
   @override
@@ -152,7 +154,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 30),
                     FlatButton(
                       onPressed: () {
-                        attemptLogIn();
+                        attemptLogIn(context, currentAccount, passwordController.text);
                       },
                       textColor: Colors.white,
                       padding: const EdgeInsets.all(0.0),

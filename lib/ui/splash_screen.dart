@@ -7,6 +7,9 @@ import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/model/location.dart';
 
 class SplashScreen extends StatefulWidget {
+  SplashScreen({Key key, this.isLoading = false}): super(key: key);
+  final isLoading;
+
   @override
   _SplashState createState() => new _SplashState();
 }
@@ -15,19 +18,23 @@ class _SplashState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    checkBackendState(context);
+    if(!widget.isLoading)
+      checkBackendState(context);
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Center(
-        child: Hero(
-          tag: 'logo',
-          child: Image.asset(
-            'assets/rs-logo.png',
+    return WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: Scaffold(
+        body: Center(
+          child: Hero(
+            tag: 'logo',
+            child: Image.asset(
+              'assets/rs-logo.png',
+            ),
           ),
         ),
       ),

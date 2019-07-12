@@ -261,6 +261,8 @@ void createAccount(BuildContext context, String username, String password,
     [String nodeName = 'Mobile']) async {
   if (password != repeatPassword) return; // Should notify user
 
+  Navigator.pushNamed(context, '/', arguments: true);
+  
   var accountDetails = {
     'location': {
       "mPpgName": username,
@@ -273,6 +275,7 @@ void createAccount(BuildContext context, String username, String password,
       body: json.encode(accountDetails));
 
   if (response.statusCode == 200) {
+    Navigator.pop(context);
     if (json.decode(response.body)['retval'])
       Navigator.pushReplacementNamed(context, '/home');
   } else {
