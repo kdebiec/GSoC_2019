@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:retroshare/ui/splash_screen.dart';
-import 'package:retroshare/ui/home_screen.dart';
+import 'package:retroshare/ui/home/home_screen.dart';
 import 'package:retroshare/ui/signin_screen.dart';
 import 'package:retroshare/ui/signup_screen.dart';
 import 'package:retroshare/ui/room/room_screen.dart';
