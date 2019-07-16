@@ -6,6 +6,7 @@ import 'package:retroshare/ui/signin_screen.dart';
 import 'package:retroshare/ui/signup_screen.dart';
 import 'package:retroshare/ui/room/room_screen.dart';
 import 'package:retroshare/ui/create_room.dart';
+import 'package:retroshare/ui/create_identity.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -28,6 +29,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => RoomScreen());
       case '/create_room':
         return MaterialPageRoute(builder: (_) => CreateRoomScreen());
+      case '/create_identity':
+        return MaterialPageRoute(builder: (_) => CreateIdentityScreen());
       default:
         return _errorRoute();
     }

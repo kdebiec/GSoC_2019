@@ -157,17 +157,16 @@ class _TopBarState extends State<TopBar> {
                           ),
                         ),
                         Visibility(
-                            visible: _getOffset == null
-                                ? false
-                                : _getOffset < appBarMaxHeight * 0.2,
-                            child: GestureDetector(
-                              child: Button(
-                                  name: 'Create new identity',
-                                  buttonIcon: Icons.add,
-                                  onPressed: () {
-                                    print('hello');
-                                  }),
-                            )),
+                          visible: _getOffset == null
+                              ? false
+                              : _getOffset < appBarMaxHeight * 0.2,
+                          child: Button(
+                              name: 'Create new identity',
+                              buttonIcon: Icons.add,
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/create_identity');
+                              }),
+                        ),
                         Visibility(
                           visible: _getOffset == null
                               ? false
