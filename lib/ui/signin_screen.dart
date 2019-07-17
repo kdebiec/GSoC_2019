@@ -34,17 +34,16 @@ class _SignInScreenState extends State<SignInScreen> {
     int resp = await requestLogIn(currentAccount, password);
 
     if (resp == 0) {
-      bool isAuthTokenValid = await checkExistingAuthTokens(currentAccount.locationId, password);
-      if(isAuthTokenValid) {
+      bool isAuthTokenValid =
+          await checkExistingAuthTokens(currentAccount.locationId, password);
+      if (isAuthTokenValid) {
         Navigator.pop(context);
         Navigator.pushReplacementNamed(context, '/home');
       }
-    }
-    else if (resp == 3)
-      Navigator.pop(context);
-      setState(() {
-        wrongPassword = true;
-      });
+    } else if (resp == 3) Navigator.pop(context);
+    setState(() {
+      wrongPassword = true;
+    });
   }
 
   List<DropdownMenuItem<Account>> getDropDownMenuItems() {
@@ -87,176 +86,194 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: SizedBox(
-          width: 300,
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Hero(
-                      tag: 'logo',
-                      child: Image.asset('assets/rs-logo.png',
-                          height: 250, width: 250),
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Color(0xFFF5F5F5),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        height: 40,
-                        child: GestureDetector(
-                          onLongPress: () {
-                            revealLocations();
-                          },
-                          child: Row(
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: viewportConstraints.maxHeight,
+              ),
+              child: IntrinsicHeight(
+                child: Center(
+                  child: SizedBox(
+                    width: 300,
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Icon(
-                                Icons.person_outline,
-                                color: Color(0xFF9E9E9E),
-                                size: 22.0,
+                              Hero(
+                                tag: 'logo',
+                                child: Image.asset('assets/rs-logo.png',
+                                    height: 250, width: 250),
                               ),
                               SizedBox(
-                                width: 15,
+                                width: double.infinity,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Color(0xFFF5F5F5),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  height: 40,
+                                  child: GestureDetector(
+                                    onLongPress: () {
+                                      revealLocations();
+                                    },
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.person_outline,
+                                          color: Color(0xFF9E9E9E),
+                                          size: 22.0,
+                                        ),
+                                        SizedBox(
+                                          width: 15,
+                                        ),
+                                        Expanded(
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton(
+                                              value: currentAccount,
+                                              items: accountsDropdown,
+                                              onChanged: changedDropDownItem,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .body2,
+                                              disabledHint: Text('Login'),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                              Expanded(
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                    value: currentAccount,
-                                    items: accountsDropdown,
-                                    onChanged: changedDropDownItem,
+                              const SizedBox(height: 15),
+                              SizedBox(
+                                width: double.infinity,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Color(0xFFF5F5F5),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  height: 40,
+                                  child: TextField(
+                                    controller: passwordController,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        icon: Icon(
+                                          Icons.lock_outline,
+                                          color: Color(0xFF9E9E9E),
+                                          size: 22.0,
+                                        ),
+                                        hintText: 'Password'),
                                     style: Theme.of(context).textTheme.body2,
-                                    disabledHint: Text('Login'),
+                                  ),
+                                ),
+                              ),
+                              Visibility(
+                                visible: wrongPassword,
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: Row(
+                                    children: <Widget>[
+                                      SizedBox(
+                                        width: 52,
+                                      ),
+                                      Container(
+                                        height: 25,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            'Wrong password',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: wrongPassword ? 10 : 30),
+                              FlatButton(
+                                onPressed: () {
+                                  attemptLogIn(
+                                      currentAccount, passwordController.text);
+                                },
+                                textColor: Colors.white,
+                                padding: const EdgeInsets.all(0.0),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      gradient: LinearGradient(
+                                        colors: <Color>[
+                                          Color(0xFF00FFFF),
+                                          Color(0xFF29ABE2),
+                                        ],
+                                        begin: Alignment(-1.0, -4.0),
+                                        end: Alignment(1.0, 4.0),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: const Text(
+                                      'Login',
+                                      style: TextStyle(fontSize: 20),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    SizedBox(
-                      width: double.infinity,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Color(0xFFF5F5F5),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        height: 40,
-                        child: TextField(
-                          controller: passwordController,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              icon: Icon(
-                                Icons.lock_outline,
-                                color: Color(0xFF9E9E9E),
-                                size: 22.0,
-                              ),
-                              hintText: 'Password'),
-                          style: Theme.of(context).textTheme.body2,
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: wrongPassword,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Row(
-                          children: <Widget>[
-                            SizedBox(
-                              width: 52,
-                            ),
-                            Container(
-                              height: 25,
-                              child: Align(
-                                alignment: Alignment.centerRight,
+                        SizedBox(
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              FlatButton(
+                                onPressed: () {},
+                                textColor: Color(0xFF9E9E9E),
+                                padding: const EdgeInsets.all(0.0),
                                 child: Text(
-                                  'Wrong password',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
+                                  'Import account',
+                                  style: Theme.of(context).textTheme.body1,
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: wrongPassword ? 10 : 30),
-                    FlatButton(
-                      onPressed: () {
-                        attemptLogIn(currentAccount, passwordController.text);
-                      },
-                      textColor: Colors.white,
-                      padding: const EdgeInsets.all(0.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            gradient: LinearGradient(
-                              colors: <Color>[
-                                Color(0xFF00FFFF),
-                                Color(0xFF29ABE2),
-                              ],
-                              begin: Alignment(-1.0, -4.0),
-                              end: Alignment(1.0, 4.0),
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(10.0),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(fontSize: 20),
-                            textAlign: TextAlign.center,
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/signup');
+                                },
+                                textColor: Color(0xFF9E9E9E),
+                                padding: const EdgeInsets.all(0.0),
+                                child: Text(
+                                  'Create account',
+                                  style: Theme.of(context).textTheme.body1,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 30),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-              SizedBox(
-                width: double.infinity,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    FlatButton(
-                      onPressed: () {},
-                      textColor: Color(0xFF9E9E9E),
-                      padding: const EdgeInsets.all(0.0),
-                      child: Text(
-                        'Import account',
-                        style: Theme.of(context).textTheme.body1,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/signup');
-                      },
-                      textColor: Color(0xFF9E9E9E),
-                      padding: const EdgeInsets.all(0.0),
-                      child: Text(
-                        'Create account',
-                        style: Theme.of(context).textTheme.body1,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
