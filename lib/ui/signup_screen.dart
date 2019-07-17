@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'package:retroshare/services/auth.dart';
+
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -29,7 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void createAccount() {
     bool success = true;
-    if (usernameController.text.length <= 3) {
+    if (usernameController.text.length < 3) {
       setState(() {
         isUsernameCorrect = false;
       });
@@ -41,7 +43,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
       success = false;
     }
-    if (passwordController.text.length <= 3) {
+    if (passwordController.text.length < 3) {
       setState(() {
         passwordError = PasswordError.tooShort;
       });
@@ -386,8 +388,10 @@ void requestAccountCreation(
 
   if (response.statusCode == 200) {
     Navigator.pop(context);
-    if (json.decode(response.body)['retval'])
-      Navigator.pushReplacementNamed(context, '/home');
+    if (json.decode(response.body)['retval']) {
+      bool isAuthTokenValid = await checkExistingAuthTokens(json.decode(response.body)['location']['mLocationId'], password);
+      if (isAuthTokenValid) Navigator.pushReplacementNamed(context, '/home');
+    }
   } else {
     throw Exception('Failed to load response');
   }

@@ -5,9 +5,10 @@ import 'package:http/http.dart' as http;
 
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/model/location.dart';
+import 'package:retroshare/services/auth.dart';
 
 class SplashScreen extends StatefulWidget {
-  SplashScreen({Key key, this.isLoading = false}): super(key: key);
+  SplashScreen({Key key, this.isLoading = false}) : super(key: key);
   final isLoading;
 
   @override
@@ -18,8 +19,7 @@ class _SplashState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    if(!widget.isLoading)
-      checkBackendState(context);
+    if (!widget.isLoading) checkBackendState(context);
   }
 
   @override
@@ -43,8 +43,9 @@ class _SplashState extends State<SplashScreen> {
 }
 
 void checkBackendState(BuildContext context) async {
-  bool loggedIn = await checkLoggedIn();
-  if (loggedIn)
+  bool isLoggedIn = await checkLoggedIn();
+  bool isTokenValid = await isAuthTokenValid();
+  if (isLoggedIn && isTokenValid)
     Navigator.pushReplacementNamed(context, '/home');
   else {
     accountsList = await getLocations();
@@ -75,12 +76,8 @@ Future<List<Account>> getLocations() async {
     List<Account> accountsList = new List();
     json.decode(response.body)['locations'].forEach((location) {
       if (location != null)
-        accountsList.add(
-            Account(
-                location['mLocationId'],
-                location['mPgpId'],
-                location['mLocationName'],
-                location['mPpgName']));
+        accountsList.add(Account(location['mLocationId'], location['mPgpId'],
+            location['mLocationName'], location['mPpgName']));
     });
 
     return accountsList;

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:retroshare/model/location.dart';
+import 'package:retroshare/services/auth.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -31,10 +32,16 @@ class _SignInScreenState extends State<SignInScreen> {
   void attemptLogIn(Account currentAccount, String password) async {
     Navigator.pushNamed(context, '/', arguments: true);
     int resp = await requestLogIn(currentAccount, password);
-    Navigator.pop(context);
-    if (resp == 0)
-      Navigator.pushReplacementNamed(context, '/home');
+
+    if (resp == 0) {
+      bool isAuthTokenValid = await checkExistingAuthTokens(currentAccount.locationId, password);
+      if(isAuthTokenValid) {
+        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    }
     else if (resp == 3)
+      Navigator.pop(context);
       setState(() {
         wrongPassword = true;
       });
@@ -266,8 +273,7 @@ dynamic requestLogIn(Account selectedAccount, String password) async {
       body: json.encode(accountDetails));
 
   if (response.statusCode == 200) {
-    print('login' + response.body);
-    return json.decode(response.body)['retval']; // == 0
+    return json.decode(response.body)['retval'];
   } else {
     throw Exception('Failed to load response');
   }
