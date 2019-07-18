@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:tuple/tuple.dart';
 
+import 'package:retroshare/model/account.dart';
+import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/auth.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -29,7 +30,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     passwordError = PasswordError.correct;
   }
 
-  void createAccount() {
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    repeatPasswordController.dispose();
+    nodeNameController.dispose();
+    super.dispose();
+  }
+
+  void createAccount() async {
     bool success = true;
     if (usernameController.text.length < 3) {
       setState(() {
@@ -52,12 +62,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (!success) return;
 
+    Tuple2<bool, Account> accountCreate;
     if (nodeNameController.text == '')
-      requestAccountCreation(
+      accountCreate = await requestAccountCreation(
           context, usernameController.text, passwordController.text);
     else
-      requestAccountCreation(context, usernameController.text,
-          passwordController.text, nodeNameController.text);
+      accountCreate = await requestAccountCreation(
+          context,
+          usernameController.text,
+          passwordController.text,
+          nodeNameController.text);
+
+    if (accountCreate != null && accountCreate.item1) {
+      bool isAuthTokenValid = await checkExistingAuthTokens(
+          accountCreate.item2.locationId, passwordController.text);
+      if (isAuthTokenValid) {
+        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    }
   }
 
   @override
@@ -367,32 +390,5 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
-  }
-}
-
-void requestAccountCreation(
-    BuildContext context, String username, String password,
-    [String nodeName = 'Mobile']) async {
-  Navigator.pushNamed(context, '/', arguments: true);
-
-  var accountDetails = {
-    'location': {
-      "mPpgName": username,
-      "mLocationName": nodeName,
-    },
-    'password': password,
-  };
-  final response = await http.post(
-      'http://localhost:9092/rsLoginHelper/createLocation',
-      body: json.encode(accountDetails));
-
-  if (response.statusCode == 200) {
-    Navigator.pop(context);
-    if (json.decode(response.body)['retval']) {
-      bool isAuthTokenValid = await checkExistingAuthTokens(json.decode(response.body)['location']['mLocationId'], password);
-      if (isAuthTokenValid) Navigator.pushReplacementNamed(context, '/home');
-    }
-  } else {
-    throw Exception('Failed to load response');
   }
 }

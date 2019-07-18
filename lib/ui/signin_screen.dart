@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
-import 'package:retroshare/model/location.dart';
+import 'package:retroshare/model/account.dart';
+import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/auth.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -27,6 +25,12 @@ class _SignInScreenState extends State<SignInScreen> {
     accountsDropdown = getDropDownMenuItems();
     currentAccount = accountsDropdown[0].value;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
   }
 
   void attemptLogIn(Account currentAccount, String password) async {
@@ -276,22 +280,5 @@ class _SignInScreenState extends State<SignInScreen> {
         },
       ),
     );
-  }
-}
-
-dynamic requestLogIn(Account selectedAccount, String password) async {
-  var accountDetails = {
-    'account': selectedAccount.locationId,
-    'password': password
-  };
-
-  final response = await http.post(
-      'http://localhost:9092/rsLoginHelper/attemptLogin',
-      body: json.encode(accountDetails));
-
-  if (response.statusCode == 200) {
-    return json.decode(response.body)['retval'];
-  } else {
-    throw Exception('Failed to load response');
   }
 }
