@@ -45,21 +45,16 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 class _SnappingScrollPhysics extends ClampingScrollPhysics {
   const _SnappingScrollPhysics({
     ScrollPhysics parent,
-    @required this.minScrollOffset,
-    @required this.midScrollOffset,
-  })  : assert(minScrollOffset != null),
-        assert(midScrollOffset != null),
+    @required this.maxScrollOffset,
+  })  : assert(maxScrollOffset != null),
         super(parent: parent);
 
-  final double minScrollOffset;
-  final double midScrollOffset;
+  final double maxScrollOffset; // TopBar have the smallest size
 
   @override
   _SnappingScrollPhysics applyTo(ScrollPhysics ancestor) {
     return _SnappingScrollPhysics(
-        parent: buildParent(ancestor),
-        minScrollOffset: minScrollOffset,
-        midScrollOffset: midScrollOffset);
+        parent: buildParent(ancestor), maxScrollOffset: maxScrollOffset);
   }
 
   Simulation _toZeroScrollOffsetSimulation(double offset, double dragVelocity) {
@@ -68,9 +63,9 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
         tolerance: tolerance);
   }
 
-  Simulation _toMinScrollOffsetSimulation(double offset, double dragVelocity) {
+  Simulation _toMaxScrollOffsetSimulation(double offset, double dragVelocity) {
     final double velocity = math.max(dragVelocity, minFlingVelocity);
-    return ScrollSpringSimulation(spring, offset, minScrollOffset, velocity,
+    return ScrollSpringSimulation(spring, offset, maxScrollOffset, velocity,
         tolerance: tolerance);
   }
 
@@ -83,17 +78,15 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
 
     if (simulation != null) {
       if (dragVelocity > 0.0)
-        return _toMinScrollOffsetSimulation(offset, dragVelocity);
-      if (dragVelocity < 0.0)
+        return _toMaxScrollOffsetSimulation(offset, dragVelocity);
+      if (dragVelocity < 0.0 )
         return _toZeroScrollOffsetSimulation(offset, dragVelocity);
-    } else {
-      if (offset > 0.0 && offset < midScrollOffset)
-        return _toZeroScrollOffsetSimulation(offset, dragVelocity);
-
-      return _toMinScrollOffsetSimulation(offset, dragVelocity);
     }
 
-    return simulation;
+    if (offset <= maxScrollOffset / 2)
+      return _toZeroScrollOffsetSimulation(offset, dragVelocity);
+
+    return _toMaxScrollOffsetSimulation(offset, dragVelocity);
   }
 }
 
@@ -119,6 +112,12 @@ class _HomeScreenState extends State<HomeScreen>
     _scrollController =
         ScrollController(initialScrollOffset: screenHeight - kAppBarMinHeight);
 
+    _scrollController.addListener(() {
+      if (_scrollController.offset < kAppBarMinHeight) {
+        setState(() {});
+      }
+    });
+
     _leftIconAnimation =
         ColorTween(begin: Colors.lightBlueAccent, end: Colors.black12)
             .animate(_tabController.animation);
@@ -131,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -159,9 +159,7 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
       body: NestedScrollView(
         controller: _scrollController,
-        physics: _SnappingScrollPhysics(
-            minScrollOffset: appBarMaxHeight,
-            midScrollOffset: appBarMidScrollOffset * 0.5),
+        physics: _SnappingScrollPhysics(maxScrollOffset: appBarMaxHeight-appBarMinHeight),
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverOverlapAbsorber(
