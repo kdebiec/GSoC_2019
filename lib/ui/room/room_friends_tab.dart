@@ -8,21 +8,20 @@ class RoomFriendsTab extends StatefulWidget {
   _RoomFriendsTabState createState() => _RoomFriendsTabState();
 }
 
-class _RoomFriendsTabState extends State<RoomFriendsTab>
-{
+class _RoomFriendsTabState extends State<RoomFriendsTab> {
   @override
   Widget build(BuildContext context) {
-    print(allPages.values.length);
     return ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: allPages.values.elementAt(0).length,//allPages[1].length,
-        itemBuilder: (BuildContext context, int index) {
-          return PersonDelegate(
-            data: allPages.values.elementAt(0)[index],
-            onPressed: () {
-              Navigator.pushNamed(context, '/room');
-            },
-          );
-        });
+      padding: const EdgeInsets.all(16.0),
+      itemCount: allPages.values.elementAt(0).length,
+      itemBuilder: (BuildContext context, int index) {
+        return PersonDelegate(
+          data: allPages.values.elementAt(0)[index],
+          onPressed: () {
+            Navigator.pushNamed(context, '/room');
+          },
+        );
+      },
+    );
   }
 }

@@ -8,37 +8,37 @@ final List<MessageDelegateData> messageData = [
       name: 'Alison Platt',
       isSent: true,
       message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
   const MessageDelegateData(
       name: 'Harriet Rabbit',
       isSent: false,
       message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
   const MessageDelegateData(
       name: 'Helen Parker',
       isSent: true,
       message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
   const MessageDelegateData(
       name: 'Alison Platt',
       isSent: true,
       message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
   const MessageDelegateData(
       name: 'Harriet Rabbit',
       isSent: false,
       message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
   const MessageDelegateData(
       name: 'Alison Platt',
       isSent: true,
       message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
   const MessageDelegateData(
       name: 'Harriet Rabbit',
       isSent: false,
       message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus nibh lacinia, placerat ligula in, aliquam est. Integer malesuada quam nec libero molestie efficitur. In cursus rhoncus nisi, '),
 ];
 
 class MessagesTab extends StatefulWidget {
@@ -53,13 +53,15 @@ class _MessagesTabState extends State<MessagesTab> {
       children: <Widget>[
         Expanded(
           child: ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: messageData.length,
-              itemBuilder: (BuildContext context, int index) {
-                return MessageDelegate(
-                  data: messageData[index],
-                );
-              }),
+            reverse: true,
+            padding: const EdgeInsets.all(16.0),
+            itemCount: messageData.length,
+            itemBuilder: (BuildContext context, int index) {
+              return MessageDelegate(
+                data: messageData[index],
+              );
+            },
+          ),
         ),
         // BottomBar
         Container(
