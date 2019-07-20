@@ -4,6 +4,7 @@ import 'package:tuple/tuple.dart';
 import 'package:retroshare/model/account.dart';
 import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/auth.dart';
+import 'package:retroshare/services/identity.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -77,6 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       bool isAuthTokenValid = await checkExistingAuthTokens(
           accountCreate.item2.locationId, passwordController.text);
       if (isAuthTokenValid) {
+        await getOwnIdentities();
         Navigator.pop(context);
         Navigator.pushReplacementNamed(context, '/home');
       }

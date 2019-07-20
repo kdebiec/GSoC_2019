@@ -4,6 +4,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:retroshare/model/account.dart';
 import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/auth.dart';
+import 'package:retroshare/services/identity.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -41,6 +42,7 @@ class _SignInScreenState extends State<SignInScreen> {
       bool isAuthTokenValid =
           await checkExistingAuthTokens(currentAccount.locationId, password);
       if (isAuthTokenValid) {
+        await getOwnIdentities();
         Navigator.pop(context);
         Navigator.pushReplacementNamed(context, '/home');
       }
