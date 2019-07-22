@@ -114,7 +114,7 @@ class _RoomScreenState extends State<RoomScreen>
                   builder: (BuildContext context, Widget widget) {
                     return IconButton(
                       icon: Icon(
-                        Icons.child_friendly,
+                        Icons.people,
                         size: 25,
                       ),
                       color: _iconAnimation.value,
