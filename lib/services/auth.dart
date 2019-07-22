@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import 'package:retroshare/common/styles.dart';
+import 'package:retroshare/model/auth.dart';
 
 Future<bool> isAuthTokenValid() async {
   final response = await http
