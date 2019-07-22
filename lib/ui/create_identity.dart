@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:retroshare/common/styles.dart';
+import 'package:retroshare/model/identity.dart';
+import 'package:retroshare/services/identity.dart';
 
 class CreateIdentityScreen extends StatefulWidget {
   @override
@@ -8,6 +10,14 @@ class CreateIdentityScreen extends StatefulWidget {
 }
 
 class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
+  TextEditingController nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +103,7 @@ class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
                                               horizontal: 15),
                                           height: 40,
                                           child: TextField(
-                                            //controller:
+                                            controller: nameController,
                                             decoration: InputDecoration(
                                                 border: InputBorder.none,
                                                 icon: Icon(
@@ -110,7 +120,9 @@ class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
                                       ),
                                       const SizedBox(height: 20),
                                       FlatButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          createIdentity(Identity('', nameController.text));
+                                        },
                                         textColor: Colors.white,
                                         padding: const EdgeInsets.all(0.0),
                                         child: SizedBox(
