@@ -77,9 +77,9 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
     final double offset = position.pixels;
 
     if (simulation != null) {
-      if (dragVelocity > 0.0)
+      if (dragVelocity >= 0.0)
         return _toMaxScrollOffsetSimulation(offset, dragVelocity);
-      if (dragVelocity < 0.0 )
+      if (dragVelocity < 0.0)
         return _toZeroScrollOffsetSimulation(offset, dragVelocity);
     }
 
@@ -107,10 +107,11 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(vsync: this, length: allPages.length);
+    _tabController = TabController(vsync: this, length: allPages.length);
 
     _scrollController =
-        ScrollController(initialScrollOffset: screenHeight - kAppBarMinHeight);
+        ScrollController(initialScrollOffset: (screenHeight - statusBarHeight) * 0.15 +
+            5 * buttonHeight - statusBarHeight+50);
 
     _scrollController.addListener(() {
       if (_scrollController.offset < kAppBarMinHeight) {
@@ -152,14 +153,13 @@ class _HomeScreenState extends State<HomeScreen>
     final double appBarMinHeight = kAppBarMinHeight - statusBarHeight;
     final double appBarMaxHeight = appBarMinHeight +
         (screenHeight - statusBarHeight) * 0.15 +
-        5 * buttonHeight;
-    final double appBarMidScrollOffset =
-        statusBarHeight + appBarMaxHeight - kAppBarMidHeight;
+        5 * buttonHeight+50;
 
     return Scaffold(
       body: NestedScrollView(
         controller: _scrollController,
-        physics: _SnappingScrollPhysics(maxScrollOffset: appBarMaxHeight-appBarMinHeight),
+        physics: _SnappingScrollPhysics(
+            maxScrollOffset: appBarMaxHeight - appBarMinHeight),
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverOverlapAbsorber(
