@@ -25,6 +25,7 @@ class _SplashState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
+    statusBarHeight = MediaQuery.of(context).padding.top;
 
     return WillPopScope(
       onWillPop: () => Future.value(false),
