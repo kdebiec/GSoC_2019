@@ -41,7 +41,8 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                 widget.scrollController.offset <=
                     (screenHeight - statusBarHeight) * 0.15 +
                         5 * buttonHeight -
-                        statusBarHeight+50)
+                        statusBarHeight +
+                        50)
               _animationController.value = 1 -
                   (widget.scrollController.offset /
                       ((screenHeight - statusBarHeight) * 0.15 +
@@ -94,50 +95,50 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
 
   Widget getHeaderBuilder(BuildContext context, Widget widget) {
     return Container(
-      child:
-        FadeTransition(
+      child: FadeTransition(
         opacity: _headerFadeAnimation,
         child: Stack(
-        children: <Widget>[
-          Transform(
-            transform: Matrix4.translationValues(
-              _leftHeaderOffsetAnimation.value,
-              0.0,
-              0.0,
-            ),
-            child: ScaleTransition(
-              scale: _leftHeaderScaleAnimation,
-              child: FadeTransition(
-                opacity: _leftHeaderFadeAnimation,
-                child: Container(
-                  child: Text(
-                    'Chats',
-                    style: Theme.of(context).textTheme.title,
+          children: <Widget>[
+            Transform(
+              transform: Matrix4.translationValues(
+                _leftHeaderOffsetAnimation.value,
+                0.0,
+                0.0,
+              ),
+              child: ScaleTransition(
+                scale: _leftHeaderScaleAnimation,
+                child: FadeTransition(
+                  opacity: _leftHeaderFadeAnimation,
+                  child: Container(
+                    child: Text(
+                      'Chats',
+                      style: Theme.of(context).textTheme.title,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Transform(
-            transform: Matrix4.translationValues(
-              _rightHeaderOffsetAnimation.value,
-              0.0,
-              0.0,
-            ),
-            child: ScaleTransition(
-              scale: _rightHeaderScaleAnimation,
-              child: FadeTransition(
-                opacity: _rightHeaderFadeAnimation,
-                child: Container(
-                  child: Text(
-                    'Friends',
-                    style: Theme.of(context).textTheme.title,
+            Transform(
+              transform: Matrix4.translationValues(
+                _rightHeaderOffsetAnimation.value,
+                0.0,
+                0.0,
+              ),
+              child: ScaleTransition(
+                scale: _rightHeaderScaleAnimation,
+                child: FadeTransition(
+                  opacity: _rightHeaderFadeAnimation,
+                  child: Container(
+                    child: Text(
+                      'Friends',
+                      style: Theme.of(context).textTheme.title,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],),
+          ],
+        ),
       ),
     );
   }
@@ -280,18 +281,19 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                                   child: Align(
                                     alignment: Alignment.centerRight,
                                     child: AnimatedBuilder(
-                                        animation: _curvedAnimation,
-                                        builder: (BuildContext context,
-                                            Widget widget) {
-                                          return FadeTransition(
-                                            opacity: _headerFadeAnimation,
-                                            child: Icon(Icons.person_add,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .body2
-                                                    .color),
-                                          );
-                                        }),
+                                      animation: _curvedAnimation,
+                                      builder: (BuildContext context,
+                                          Widget widget) {
+                                        return FadeTransition(
+                                          opacity: _headerFadeAnimation,
+                                          child: Icon(Icons.person_add,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .body2
+                                                  .color),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),

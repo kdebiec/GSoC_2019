@@ -4,10 +4,9 @@ import 'package:flutter/rendering.dart';
 import 'dart:math' as math;
 
 import 'package:retroshare/ui/home/topbar.dart';
+import 'package:retroshare/ui/home/chats_tab.dart';
+import 'package:retroshare/ui/home/friends_tab.dart';
 import 'package:retroshare/common/styles.dart';
-import 'package:retroshare/ui/person_delegate.dart';
-
-import 'package:retroshare/model/home_tabs.dart';
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   _SliverAppBarDelegate({
@@ -107,11 +106,13 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: allPages.length);
+    _tabController = TabController(vsync: this, length: 2);
 
-    _scrollController =
-        ScrollController(initialScrollOffset: (screenHeight - statusBarHeight) * 0.15 +
-            5 * buttonHeight - statusBarHeight+50);
+    _scrollController = ScrollController(
+        initialScrollOffset: (screenHeight - statusBarHeight) * 0.15 +
+            5 * buttonHeight -
+            statusBarHeight +
+            50);
 
     _scrollController.addListener(() {
       if (_scrollController.offset < kAppBarMinHeight) {
@@ -153,7 +154,8 @@ class _HomeScreenState extends State<HomeScreen>
     final double appBarMinHeight = kAppBarMinHeight - statusBarHeight;
     final double appBarMaxHeight = appBarMinHeight +
         (screenHeight - statusBarHeight) * 0.15 +
-        5 * buttonHeight+50;
+        5 * buttonHeight +
+        50;
 
     return Scaffold(
       body: NestedScrollView(
@@ -179,45 +181,10 @@ class _HomeScreenState extends State<HomeScreen>
         },
         body: TabBarView(
           controller: _tabController,
-          children: allPages.keys.map<Widget>((Page page) {
-            return SafeArea(
-              top: false,
-              bottom: false,
-              child: Builder(
-                builder: (BuildContext context) {
-                  return CustomScrollView(
-                    key: PageStorageKey<Page>(page),
-                    slivers: <Widget>[
-                      SliverOverlapInjector(
-                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                            context),
-                      ),
-                      SliverPadding(
-                        padding: const EdgeInsets.only(
-                            left: 8, top: 8, right: 16, bottom: 8),
-                        sliver: SliverFixedExtentList(
-                          itemExtent: personDelegateHeight,
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              final PersonDelegateData data =
-                                  allPages[page][index];
-                              return PersonDelegate(
-                                data: data,
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/room');
-                                },
-                              );
-                            },
-                            childCount: allPages[page].length,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            );
-          }).toList(),
+          children: [
+            ChatsTab(),
+            FriendsTab(),
+          ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
