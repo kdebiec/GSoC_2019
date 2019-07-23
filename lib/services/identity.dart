@@ -40,7 +40,9 @@ Future<bool> getOwnIdentities() async {
   ownIdsList = ownSignedIdsList + ownPseudonymousIdsList;
   await loadOwnIdentitiesDetails();
 
-  currId = ownIdsList.first;
+  if(ownIdsList.isNotEmpty)
+    currId = ownIdsList.first;
+
   return success;
 }
 
