@@ -1,12 +1,7 @@
 class Identity {
   String mId;
   String name;
+  bool signed;
 
-  Identity(this.mId, [this.name = '']);
+  Identity(this.mId, [this.signed, this.name = '']);
 }
-
-List<Identity> ownSignedIdsList;
-List<Identity> ownPseudonymousIdsList;
-List<Identity> ownIdsList;
-
-Identity currId;

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'dart:math' as math;
 
 import 'package:retroshare/common/button.dart';
 import 'package:retroshare/common/styles.dart';
-import 'package:retroshare/model/identity.dart';
+import 'package:retroshare/redux/model/identity_state.dart';
 
 class TopBar extends StatefulWidget {
   final ScrollController scrollController;
@@ -216,7 +217,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                         Visibility(
                           visible: _getOffset == null
                               ? false
-                              : _getOffset < appBarMaxHeight * 0.5,
+                              : _getOffset < appBarMaxHeight * 0.7,
                           child: Button(
                               name: 'Options',
                               buttonIcon: Icons.settings,
@@ -227,7 +228,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                         Visibility(
                           visible: _getOffset == null
                               ? false
-                              : _getOffset < appBarMaxHeight * 0.6,
+                              : _getOffset < appBarMaxHeight * 0.8,
                           child: Button(
                               name: 'Log out', buttonIcon: Icons.exit_to_app),
                         ),
@@ -303,23 +304,29 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                         AnimatedBuilder(
                           animation: _curvedAnimation,
                           builder: (BuildContext context, Widget widget) {
-                            return Center(
-                              child: Container(
-                                height: 50 * _curvedAnimation.value,
-                                child: Center(
-                                  child: ScaleTransition(
-                                    scale: _curvedAnimation,
-                                    child: FadeTransition(
-                                      opacity: _curvedAnimation,
-                                      child: Text(
-                                        currId.name,
-                                        style:
-                                            Theme.of(context).textTheme.title,
+                            return StoreConnector<IdentityState, String>(
+                              converter: (store) => store.state.currId.name,
+                              builder: (context, idName) {
+                                return Center(
+                                  child: Container(
+                                    height: 50 * _curvedAnimation.value,
+                                    child: Center(
+                                      child: ScaleTransition(
+                                        scale: _curvedAnimation,
+                                        child: FadeTransition(
+                                          opacity: _curvedAnimation,
+                                          child: Text(
+                                            idName,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .title,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             );
                           },
                         ),

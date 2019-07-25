@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/model/account.dart';
+import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/auth.dart';
 import 'package:retroshare/services/identity.dart';
+
+import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/actions/identity_actions.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -78,7 +83,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       bool isAuthTokenValid = await checkExistingAuthTokens(
           accountCreate.item2.locationId, passwordController.text);
       if (isAuthTokenValid) {
-        await getOwnIdentities();
+        List<Identity> ownIdsList = await getOwnIdentities();
+        final store = StoreProvider.of<IdentityState>(context);
+        store.dispatch(UpdateIdentitiesAction(ownIdsList));
+
         Navigator.pop(context);
         Navigator.pushReplacementNamed(context, '/home');
       }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/services/auth.dart';
 import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/identity.dart';
 import 'package:retroshare/model/account.dart';
+import 'package:retroshare/model/identity.dart';
+
+import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/actions/identity_actions.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key, this.isLoading = false}) : super(key: key);
@@ -47,7 +52,10 @@ void checkBackendState(BuildContext context) async {
   bool isLoggedIn = await checkLoggedIn();
   bool isTokenValid = await isAuthTokenValid();
   if (isLoggedIn && isTokenValid) {
-    await getOwnIdentities();
+    List<Identity> ownIdsList = await getOwnIdentities();
+    final store = StoreProvider.of<IdentityState>(context);
+    store.dispatch(UpdateIdentitiesAction(ownIdsList));
+
     Navigator.pushReplacementNamed(context, '/home');
   }
   else {

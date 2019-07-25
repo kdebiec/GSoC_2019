@@ -5,8 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/model/auth.dart';
 
-Future<bool> getOwnIdentities() async {
-  bool success = false;
+Future<List<Identity>> getOwnIdentities() async {
+  List<Identity> ownSignedIdsList;
+
   final respSigned = await http
       .get('http://localhost:9092/rsIdentity/getOwnSignedIds', headers: {
     HttpHeaders.authorizationHeader:
@@ -14,14 +15,13 @@ Future<bool> getOwnIdentities() async {
   });
 
   if (respSigned.statusCode == 200) {
-    success = true;
-
     ownSignedIdsList = List();
     json.decode(respSigned.body)['ids'].forEach((id) {
-      if (id != null) ownSignedIdsList.add(Identity(id));
+      if (id != null) ownSignedIdsList.add(Identity(id, true));
     });
   }
 
+  List<Identity> ownPseudonymousIdsList;
   final respPseudonymous = await http
       .get('http://localhost:9092/rsIdentity/getOwnPseudonimousIds', headers: {
     HttpHeaders.authorizationHeader:
@@ -29,24 +29,18 @@ Future<bool> getOwnIdentities() async {
   });
 
   if (respPseudonymous.statusCode == 200) {
-    success = true;
-
-    ownPseudonymousIdsList = List();
     json.decode(respPseudonymous.body)['ids'].forEach((id) {
-      if (id != null) ownPseudonymousIdsList.add(Identity(id));
+      if (id != null) ownPseudonymousIdsList.add(Identity(id, false));
     });
   }
 
-  ownIdsList = ownSignedIdsList + ownPseudonymousIdsList;
-  await loadOwnIdentitiesDetails();
-
-  if(ownIdsList.isNotEmpty)
-    currId = ownIdsList.first;
-
-  return success;
+  List<Identity> ownIdsList = ownSignedIdsList + ownPseudonymousIdsList;
+  await loadOwnIdentitiesDetails(ownIdsList);
+  
+  return ownIdsList;
 }
 
-dynamic loadOwnIdentitiesDetails() async {
+dynamic loadOwnIdentitiesDetails(List<Identity> ownIdsList) async {
   for (Identity id in ownIdsList) {
     final response = await http.post(
         'http://localhost:9092/rsIdentity/getIdDetails',

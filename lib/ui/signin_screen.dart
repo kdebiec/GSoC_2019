@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/model/account.dart';
+import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/auth.dart';
 import 'package:retroshare/services/identity.dart';
+
+import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/actions/identity_actions.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -42,7 +47,10 @@ class _SignInScreenState extends State<SignInScreen> {
       bool isAuthTokenValid =
           await checkExistingAuthTokens(currentAccount.locationId, password);
       if (isAuthTokenValid) {
-        await getOwnIdentities();
+        List<Identity> ownIdsList = await getOwnIdentities();
+        final store = StoreProvider.of<IdentityState>(context);
+        store.dispatch(UpdateIdentitiesAction(ownIdsList));
+
         Navigator.pop(context);
         Navigator.pushReplacementNamed(context, '/home');
       }

@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:redux/redux.dart';
 
 import 'package:retroshare/routes.dart';
+import 'package:retroshare/redux/store.dart';
+import 'package:retroshare/redux/model/identity_state.dart';
 
-void main() => runApp(App());
+void main() async {
+  final identityStore = await createIdentityStore();
+  runApp(App(identityStore));
+}
 
 class App extends StatefulWidget {
+  final Store<IdentityState> identityStore;
+
+  App(this.identityStore);
+
   @override
   _AppState createState() => new _AppState();
 }
