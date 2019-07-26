@@ -6,7 +6,7 @@ import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/model/auth.dart';
 
 Future<List<Identity>> getOwnIdentities() async {
-  List<Identity> ownSignedIdsList;
+  List<Identity> ownSignedIdsList = List<Identity>();
 
   final respSigned = await http
       .get('http://localhost:9092/rsIdentity/getOwnSignedIds', headers: {
@@ -21,7 +21,7 @@ Future<List<Identity>> getOwnIdentities() async {
     });
   }
 
-  List<Identity> ownPseudonymousIdsList;
+  List<Identity> ownPseudonymousIdsList = List<Identity>();
   final respPseudonymous = await http
       .get('http://localhost:9092/rsIdentity/getOwnPseudonimousIds', headers: {
     HttpHeaders.authorizationHeader:
@@ -36,23 +36,33 @@ Future<List<Identity>> getOwnIdentities() async {
 
   List<Identity> ownIdsList = ownSignedIdsList + ownPseudonymousIdsList;
   await loadOwnIdentitiesDetails(ownIdsList);
-  
+
   return ownIdsList;
 }
 
 dynamic loadOwnIdentitiesDetails(List<Identity> ownIdsList) async {
-  for (Identity id in ownIdsList) {
-    final response = await http.post(
-        'http://localhost:9092/rsIdentity/getIdDetails',
-        body: json.encode({'id': id.mId}),
-        headers: {
-          HttpHeaders.authorizationHeader:
-              'Basic ' + base64.encode(utf8.encode('$authToken'))
-        });
+  bool success = true;
+  do {
+    success = true;
+    for (Identity id in ownIdsList) {
+      final response = await http.post(
+          'http://localhost:9092/rsIdentity/getIdDetails',
+          body: json.encode({'id': id.mId}),
+          headers: {
+            HttpHeaders.authorizationHeader:
+            'Basic ' + base64.encode(utf8.encode('$authToken'))
+          });
 
-    if (response.statusCode == 200)
-      id.name = json.decode(response.body)['details']['mNickname'];
-  }
+      if (response.statusCode == 200) {
+        if (!json.decode(response.body)['retval']) {
+          success = false;
+          break;
+        }
+
+        id.name = json.decode(response.body)['details']['mNickname'];
+      }
+    }
+  } while(!success);
 }
 
 Future<bool> createIdentity(Identity identity) async {

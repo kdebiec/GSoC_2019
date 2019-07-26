@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/routes.dart';
 import 'package:retroshare/redux/store.dart';
@@ -23,16 +24,15 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    return OKToast(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Retroshare',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          iconTheme: IconThemeData(color: Colors.black12),
+    return StoreProvider<IdentityState>(
+      store: widget.identityStore,
+      child: OKToast(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Retroshare',
+          initialRoute: '/',
+          onGenerateRoute: RouteGenerator.generateRoute,
         ),
-        initialRoute: '/',
-        onGenerateRoute: RouteGenerator.generateRoute,
       ),
     );
   }
