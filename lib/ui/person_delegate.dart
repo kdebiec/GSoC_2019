@@ -1,42 +1,106 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/common/styles.dart';
+import 'package:retroshare/model/identity.dart';
+import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/actions/identity_actions.dart';
 
 class PersonDelegateData {
   const PersonDelegateData(
       {this.name,
+      this.mId,
       this.message = 'Lorem ipsum dolor sit...',
       this.time = '2 sec',
       this.profileImage = 'assets/profile.jpg',
-      this.isOnline = true,
+      this.isOnline = false,
       this.isMessage = false,
-      this.isUnread = false});
+      this.isUnread = false,
+      this.isTime = false});
   final String name;
+  final String mId;
   final String message;
   final String time;
   final String profileImage;
   final bool isOnline;
   final bool isMessage;
   final bool isUnread;
+  final bool isTime;
 }
 
-class PersonDelegate extends StatelessWidget {
-  const PersonDelegate({this.data, this.onPressed});
-
-  final double delegateHeight = personDelegateHeight;
+class PersonDelegate extends StatefulWidget {
   final PersonDelegateData data;
   final Function onPressed;
+  final bool isSelectable;
+
+  const PersonDelegate({this.data, this.onPressed, this.isSelectable = false});
 
   @override
-  Widget build(BuildContext context) {
+  _PersonDelegateState createState() => _PersonDelegateState();
+}
+
+class _PersonDelegateState extends State<PersonDelegate>
+    with SingleTickerProviderStateMixin {
+  final double delegateHeight = personDelegateHeight;
+
+  Animation<Decoration> boxShadow;
+  AnimationController _animationController;
+  CurvedAnimation _curvedAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+    _curvedAnimation =
+        CurvedAnimation(parent: _animationController, curve: Curves.easeOut);
+
+    boxShadow = DecorationTween(
+      begin: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withOpacity(0),
+            blurRadius: 0.0,
+            spreadRadius: appBarHeight / 3,
+          )
+        ],
+        borderRadius: BorderRadius.all(Radius.circular(appBarHeight / 3)),
+        color: Colors.white.withOpacity(0),
+      ),
+      end: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10.0,
+            spreadRadius: 2.0,
+            offset: Offset(
+              0.0,
+              0.0,
+            ),
+          )
+        ],
+        borderRadius: BorderRadius.all(Radius.circular(appBarHeight / 3)),
+        color: Colors.white,
+      ),
+    ).animate(_curvedAnimation);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  Widget _build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if(onPressed != null)
-          onPressed();
+        if (widget.onPressed != null) widget.onPressed();
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: Duration(seconds: 1),
+        curve: Curves.fastOutSlowIn,
         height: delegateHeight,
-        color: Colors.white,
+        decoration: boxShadow.value,
         child: Row(
           children: <Widget>[
             Container(
@@ -47,7 +111,7 @@ class PersonDelegate extends StatelessWidget {
                 children: <Widget>[
                   Center(
                     child: Visibility(
-                      visible: data.isUnread,
+                      visible: widget.data.isUnread,
                       child: Container(
                         height: delegateHeight * 0.92,
                         width: delegateHeight * 0.92,
@@ -68,14 +132,14 @@ class PersonDelegate extends StatelessWidget {
                   ),
                   Center(
                     child: Container(
-                      height: data.isUnread
+                      height: widget.data.isUnread
                           ? delegateHeight * 0.85
                           : delegateHeight * 0.8,
-                      width: data.isUnread
+                      width: widget.data.isUnread
                           ? delegateHeight * 0.85
                           : delegateHeight * 0.8,
                       decoration: BoxDecoration(
-                        border: data.isUnread
+                        border: widget.data.isUnread
                             ? Border.all(
                                 color: Colors.white,
                                 width: delegateHeight * 0.03)
@@ -85,13 +149,13 @@ class PersonDelegate extends StatelessWidget {
                             BorderRadius.circular(delegateHeight * 0.8 * 0.33),
                         image: DecorationImage(
                           fit: BoxFit.fitWidth,
-                          image: AssetImage(data.profileImage),
+                          image: AssetImage(widget.data.profileImage),
                         ),
                       ),
                     ),
                   ),
                   Visibility(
-                    visible: data.isOnline,
+                    visible: widget.data.isOnline,
                     child: Positioned(
                       bottom: delegateHeight * 0.73,
                       left: delegateHeight * 0.73,
@@ -120,15 +184,15 @@ class PersonDelegate extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      data.name,
-                      style: data.isMessage
+                      widget.data.name,
+                      style: widget.data.isMessage
                           ? Theme.of(context).textTheme.body2
                           : Theme.of(context).textTheme.body1,
                     ),
                     Visibility(
-                      visible: data.isMessage,
+                      visible: widget.data.isMessage,
                       child: Text(
-                        data.message,
+                        widget.data.message,
                         style: Theme.of(context).textTheme.body1,
                       ),
                     ),
@@ -136,10 +200,32 @@ class PersonDelegate extends StatelessWidget {
                 ),
               ),
             ),
-            Text(data.time, style: Theme.of(context).textTheme.caption),
+            Visibility(
+              visible: widget.data.isTime,
+              child: Text(widget.data.time,
+                  style: Theme.of(context).textTheme.caption),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isSelectable) {
+      return StoreConnector<IdentityState, Identity>(
+        converter: (store) => store.state.selectedId,
+        builder: (context, id) {
+          if (id.mId == widget.data.mId)
+            _animationController.value = 1;
+          else
+            _animationController.value = 0;
+
+          return _build(context);
+        },
+      );
+    } else
+      return _build(context);
   }
 }

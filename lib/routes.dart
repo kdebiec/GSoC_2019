@@ -8,6 +8,7 @@ import 'package:retroshare/ui/room/room_screen.dart';
 import 'package:retroshare/ui/create_room.dart';
 import 'package:retroshare/ui/create_identity.dart';
 import 'package:retroshare/ui/launch_transition_screen.dart';
+import 'package:retroshare/ui/change_identity.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -34,21 +35,25 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => CreateRoomScreen());
       case '/create_identity':
         return MaterialPageRoute(builder: (_) => CreateIdentityScreen());
+      case '/change_identity':
+        return MaterialPageRoute(builder: (_) => ChangeIdentityScreen());
       default:
         return _errorRoute();
     }
   }
 
   static Route<dynamic> _errorRoute() {
-    return MaterialPageRoute(builder: (_) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Error'),
-        ),
-        body: Center(
-          child: Text('Error'),
-        ),
-      );
-    });
+    return MaterialPageRoute(
+      builder: (_) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Error'),
+          ),
+          body: Center(
+            child: Text('Error'),
+          ),
+        );
+      },
+    );
   }
 }

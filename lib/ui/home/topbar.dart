@@ -203,8 +203,12 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                               ? false
                               : _getOffset < appBarMaxHeight * 0.4,
                           child: Button(
-                              name: 'Change identity',
-                              buttonIcon: Icons.visibility),
+                            name: 'Change identity',
+                            buttonIcon: Icons.visibility,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/change_identity');
+                            },
+                          ),
                         ),
                         Visibility(
                           visible: _getOffset == null

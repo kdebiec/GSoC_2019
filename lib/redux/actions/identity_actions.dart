@@ -1,9 +1,15 @@
 import 'package:retroshare/model/identity.dart';
 
-class ChangeIdentityAction {
+class ChangeCurrentIdentityAction {
   final Identity identity;
 
-  ChangeIdentityAction(this.identity);
+  ChangeCurrentIdentityAction(this.identity);
+}
+
+class ChangeSelectedIdentityAction {
+  final Identity identity;
+
+  ChangeSelectedIdentityAction(this.identity);
 }
 
 class UpdateIdentitiesAction {
