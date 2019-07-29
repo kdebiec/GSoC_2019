@@ -4,7 +4,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/redux/model/identity_state.dart';
-import 'package:retroshare/redux/actions/identity_actions.dart';
 
 class PersonDelegateData {
   const PersonDelegateData(
