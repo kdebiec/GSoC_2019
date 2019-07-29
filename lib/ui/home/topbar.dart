@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:retroshare/common/button.dart';
 import 'package:retroshare/common/styles.dart';
+import 'package:retroshare/model/identity.dart';
+import 'package:retroshare/services/identity.dart';
 import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/actions/identity_actions.dart';
 
 class TopBar extends StatefulWidget {
   final ScrollController scrollController;
@@ -36,12 +40,13 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
     _animationController = AnimationController(vsync: this);
     _curvedAnimation =
         CurvedAnimation(parent: _animationController, curve: Curves.easeOut);
+
     widget.scrollController
       ..addListener(() => setState(() {
             if (widget.scrollController.offset >= 0 &&
                 widget.scrollController.offset <=
                     (screenHeight - statusBarHeight) * 0.15 +
-                        5 * buttonHeight -
+                        4 * buttonHeight -
                         statusBarHeight +
                         50)
               _animationController.value = 1 -
@@ -92,6 +97,63 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
       return widget.scrollController.offset;
     } else
       return 0;
+  }
+
+  void _showDialog() {
+    final store = StoreProvider.of<IdentityState>(context);
+    String name = store.state.currId.name;
+    if (store.state.ownIdsList.length > 1)
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Delete '$name'?"),
+            content: Text(
+                "The deletion of identity cannot be undone. Are you sure you want to continue?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text('Delete'),
+                onPressed: () async {
+                  bool success = await deleteIdentity(store.state.currId);
+
+                  if (success) {
+                    List<Identity> ownIdsList = await getOwnIdentities();
+                    final store = StoreProvider.of<IdentityState>(context);
+                    store.dispatch(UpdateIdentitiesAction(ownIdsList));
+
+                    Navigator.pushReplacementNamed(context, '/change_identity');
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    else
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Too few identities"),
+            content: Text(
+                "You must have at least one more identity to be able to delete this one."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
   }
 
   Widget getHeaderBuilder(BuildContext context, Widget widget) {
@@ -152,7 +214,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
     final double appBarMinHeight = kAppBarMinHeight - statusBarHeight;
     final double appBarMaxHeight = appBarMinHeight +
         (screenHeight - statusBarHeight) * 0.15 +
-        5 * buttonHeight;
+        4 * buttonHeight;
 
     double heightOfTopBar = _getOffset == null
         ? appBarMinHeight
@@ -191,12 +253,12 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                               ? false
                               : _getOffset < appBarMaxHeight * 0.3,
                           child: Button(
-                              name: 'Create new identity',
-                              buttonIcon: Icons.add,
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, '/create_identity');
-                              }),
+                            name: 'Create new identity',
+                            buttonIcon: Icons.add,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/create_identity');
+                            },
+                          ),
                         ),
                         Visibility(
                           visible: _getOffset == null
@@ -215,26 +277,24 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                               ? false
                               : _getOffset < appBarMaxHeight * 0.4,
                           child: Button(
-                              name: 'Delete identity',
-                              buttonIcon: Icons.delete),
+                            name: 'Delete identity',
+                            buttonIcon: Icons.delete,
+                            onPressed: () {
+                              _showDialog();
+                            },
+                          ),
                         ),
                         Visibility(
                           visible: _getOffset == null
                               ? false
                               : _getOffset < appBarMaxHeight * 0.7,
                           child: Button(
-                              name: 'Options',
-                              buttonIcon: Icons.settings,
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/settings');
-                              }),
-                        ),
-                        Visibility(
-                          visible: _getOffset == null
-                              ? false
-                              : _getOffset < appBarMaxHeight * 0.8,
-                          child: Button(
-                              name: 'Log out', buttonIcon: Icons.exit_to_app),
+                            name: 'Options',
+                            buttonIcon: Icons.settings,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/settings');
+                            },
+                          ),
                         ),
                       ],
                     ),
