@@ -65,7 +65,7 @@ dynamic loadOwnIdentitiesDetails(List<Identity> ownIdsList) async {
   } while(!success);
 }
 
-Future<bool> createIdentity(Identity identity) async {
+Future<Identity> createIdentity(Identity identity) async {
   final response = await http.post(
       'http://localhost:9092/rsIdentity/createIdentity',
       body: json.encode({'name': identity.name}),
@@ -76,9 +76,9 @@ Future<bool> createIdentity(Identity identity) async {
 
   if (response.statusCode == 200) {
     if (json.decode(response.body)['retval'])
-      return true;
+      return Identity(json.decode(response.body)['id'], identity.signed, identity.name);
     else
-      return false;
+      return Identity('');
   } else
     throw Exception('Failed to load response');
 }
