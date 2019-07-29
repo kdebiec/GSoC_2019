@@ -9,6 +9,7 @@ import 'package:retroshare/ui/create_room.dart';
 import 'package:retroshare/ui/create_identity.dart';
 import 'package:retroshare/ui/launch_transition_screen.dart';
 import 'package:retroshare/ui/change_identity.dart';
+import 'package:retroshare/ui/add_friend_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -37,6 +38,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => CreateIdentityScreen());
       case '/change_identity':
         return MaterialPageRoute(builder: (_) => ChangeIdentityScreen());
+      case '/add_friend':
+        return MaterialPageRoute(builder: (_) => AddFriendScreen());
       default:
         return _errorRoute();
     }

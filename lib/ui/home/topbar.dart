@@ -291,11 +291,16 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                                           Widget widget) {
                                         return FadeTransition(
                                           opacity: _headerFadeAnimation,
-                                          child: Icon(Icons.person_add,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .body2
-                                                  .color),
+                                          child: IconButton(
+                                            icon: Icon(Icons.person_add,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .body2
+                                                    .color),
+                                            onPressed: () {
+                                              Navigator.of(context).pushNamed('/add_friend');
+                                            },
+                                          ),
                                         );
                                       },
                                     ),
