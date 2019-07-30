@@ -5,10 +5,10 @@ import 'package:retroshare/ui/home/home_screen.dart';
 import 'package:retroshare/ui/signin_screen.dart';
 import 'package:retroshare/ui/signup_screen.dart';
 import 'package:retroshare/ui/room/room_screen.dart';
-import 'package:retroshare/ui/create_room.dart';
-import 'package:retroshare/ui/create_identity.dart';
+import 'package:retroshare/ui/create_room_screen.dart';
+import 'package:retroshare/ui/create_identity_screen.dart';
 import 'package:retroshare/ui/launch_transition_screen.dart';
-import 'package:retroshare/ui/change_identity.dart';
+import 'package:retroshare/ui/change_identity_screen.dart';
 import 'package:retroshare/ui/add_friend_screen.dart';
 
 class RouteGenerator {
@@ -35,6 +35,10 @@ class RouteGenerator {
       case '/create_room':
         return MaterialPageRoute(builder: (_) => CreateRoomScreen());
       case '/create_identity':
+        if (args is bool)
+          return MaterialPageRoute(
+              builder: (_) => CreateIdentityScreen(isFirstId: args));
+
         return MaterialPageRoute(builder: (_) => CreateIdentityScreen());
       case '/change_identity':
         return MaterialPageRoute(builder: (_) => ChangeIdentityScreen());

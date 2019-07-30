@@ -98,10 +98,9 @@ Future<bool> addCert(String cert) async {
     HttpHeaders.authorizationHeader:
     'Basic ' + base64.encode(utf8.encode('$authToken'))
   },
-  body: {'invite': cert});
+  body: json.encode({'invite': cert}));
 
   if (response.statusCode == 200) {
-    print(json.decode(response.body));
     return json.decode(response.body)['retval'];
   } else {
     throw Exception('Failed to load response');

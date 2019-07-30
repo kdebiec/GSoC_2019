@@ -53,10 +53,14 @@ void checkBackendState(BuildContext context) async {
   bool isTokenValid = await isAuthTokenValid();
   if (isLoggedIn && isTokenValid) {
     List<Identity> ownIdsList = await getOwnIdentities();
-    final store = StoreProvider.of<IdentityState>(context);
-    store.dispatch(UpdateIdentitiesAction(ownIdsList));
 
-    Navigator.pushReplacementNamed(context, '/home');
+    if (ownIdsList.isEmpty)
+      Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
+    else {
+      final store = StoreProvider.of<IdentityState>(context);
+      store.dispatch(UpdateIdentitiesAction(ownIdsList));
+      Navigator.pushReplacementNamed(context, '/home');
+    }
   }
   else {
     await getLocations();

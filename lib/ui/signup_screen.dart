@@ -69,6 +69,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (!success) return;
 
     Tuple2<bool, Account> accountCreate;
+    Navigator.pushNamed(context, '/', arguments: true);
     if (nodeNameController.text == '')
       accountCreate = await requestAccountCreation(
           context, usernameController.text, passwordController.text);
@@ -84,11 +85,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
           accountCreate.item2.locationId, passwordController.text);
       if (isAuthTokenValid) {
         List<Identity> ownIdsList = await getOwnIdentities();
-        final store = StoreProvider.of<IdentityState>(context);
-        store.dispatch(UpdateIdentitiesAction(ownIdsList));
 
         Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/home');
+
+        if (ownIdsList.isEmpty)
+          Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
+        else {
+          final store = StoreProvider.of<IdentityState>(context);
+          store.dispatch(UpdateIdentitiesAction(ownIdsList));
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       }
     }
   }

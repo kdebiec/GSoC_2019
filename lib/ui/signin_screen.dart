@@ -48,11 +48,16 @@ class _SignInScreenState extends State<SignInScreen> {
           await checkExistingAuthTokens(currentAccount.locationId, password);
       if (isAuthTokenValid) {
         List<Identity> ownIdsList = await getOwnIdentities();
-        final store = StoreProvider.of<IdentityState>(context);
-        store.dispatch(UpdateIdentitiesAction(ownIdsList));
 
         Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/home');
+
+        if (ownIdsList.isEmpty)
+          Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
+        else {
+          final store = StoreProvider.of<IdentityState>(context);
+          store.dispatch(UpdateIdentitiesAction(ownIdsList));
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       }
     } else if (resp == 3) Navigator.pop(context);
     setState(() {
@@ -178,13 +183,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                   child: TextField(
                                     controller: passwordController,
                                     decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        icon: Icon(
-                                          Icons.lock_outline,
-                                          color: Color(0xFF9E9E9E),
-                                          size: 22.0,
-                                        ),
-                                        hintText: 'Password',),
+                                      border: InputBorder.none,
+                                      icon: Icon(
+                                        Icons.lock_outline,
+                                        color: Color(0xFF9E9E9E),
+                                        size: 22.0,
+                                      ),
+                                      hintText: 'Password',
+                                    ),
                                     style: Theme.of(context).textTheme.body2,
                                     obscureText: true,
                                   ),
