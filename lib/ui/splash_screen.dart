@@ -8,8 +8,8 @@ import 'package:retroshare/services/identity.dart';
 import 'package:retroshare/model/account.dart';
 import 'package:retroshare/model/identity.dart';
 
-import 'package:retroshare/redux/model/identity_state.dart';
-import 'package:retroshare/redux/actions/identity_actions.dart';
+import 'package:retroshare/redux/model/app_state.dart';
+import 'package:retroshare/redux/actions/app_actions.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key, this.isLoading = false}) : super(key: key);
@@ -57,8 +57,8 @@ void checkBackendState(BuildContext context) async {
     if (ownIdsList.isEmpty)
       Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
     else {
-      final store = StoreProvider.of<IdentityState>(context);
-      store.dispatch(UpdateIdentitiesAction(ownIdsList));
+      final store = StoreProvider.of<AppState>(context);
+      store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
       Navigator.pushReplacementNamed(context, '/home');
     }
   }

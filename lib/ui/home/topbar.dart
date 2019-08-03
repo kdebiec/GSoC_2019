@@ -8,8 +8,8 @@ import 'package:retroshare/common/button.dart';
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/services/identity.dart';
-import 'package:retroshare/redux/model/identity_state.dart';
-import 'package:retroshare/redux/actions/identity_actions.dart';
+import 'package:retroshare/redux/model/app_state.dart';
+import 'package:retroshare/redux/actions/app_actions.dart';
 
 class TopBar extends StatefulWidget {
   final ScrollController scrollController;
@@ -100,7 +100,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
   }
 
   void _showDialog() {
-    final store = StoreProvider.of<IdentityState>(context);
+    final store = StoreProvider.of<AppState>(context);
     String name = store.state.currId.name;
     if (store.state.ownIdsList.length > 1)
       showDialog(
@@ -124,8 +124,8 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
 
                   if (success) {
                     List<Identity> ownIdsList = await getOwnIdentities();
-                    final store = StoreProvider.of<IdentityState>(context);
-                    store.dispatch(UpdateIdentitiesAction(ownIdsList));
+                    final store = StoreProvider.of<AppState>(context);
+                    store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
 
                     Navigator.pushReplacementNamed(context, '/change_identity');
                   }
@@ -373,7 +373,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                         AnimatedBuilder(
                           animation: _curvedAnimation,
                           builder: (BuildContext context, Widget widget) {
-                            return StoreConnector<IdentityState, String>(
+                            return StoreConnector<AppState, String>(
                               converter: (store) => store.state.currId.name,
                               builder: (context, idName) {
                                 return Center(

@@ -8,8 +8,8 @@ import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/auth.dart';
 import 'package:retroshare/services/identity.dart';
 
-import 'package:retroshare/redux/model/identity_state.dart';
-import 'package:retroshare/redux/actions/identity_actions.dart';
+import 'package:retroshare/redux/model/app_state.dart';
+import 'package:retroshare/redux/actions/app_actions.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -91,8 +91,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (ownIdsList.isEmpty)
           Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
         else {
-          final store = StoreProvider.of<IdentityState>(context);
-          store.dispatch(UpdateIdentitiesAction(ownIdsList));
+          final store = StoreProvider.of<AppState>(context);
+          store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
           Navigator.pushReplacementNamed(context, '/home');
         }
       }

@@ -1,12 +1,12 @@
 import 'package:redux/redux.dart';
 
-import 'package:retroshare/redux/reducers/identity_reducer.dart';
-import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/reducers/app_reducer.dart';
+import 'package:retroshare/redux/model/app_state.dart';
 
-Future<Store<IdentityState>> createIdentityStore() async {
+Future<Store<AppState>> createIdentityStore() async {
   return Store(
     identityStateReducers,
-    initialState: IdentityState()
+    initialState: AppState()
   );
 }
 

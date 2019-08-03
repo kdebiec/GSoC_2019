@@ -3,7 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/model/identity.dart';
-import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/model/app_state.dart';
 
 class PersonDelegateData {
   const PersonDelegateData(
@@ -213,7 +213,7 @@ class _PersonDelegateState extends State<PersonDelegate>
   @override
   Widget build(BuildContext context) {
     if (widget.isSelectable) {
-      return StoreConnector<IdentityState, Identity>(
+      return StoreConnector<AppState, Identity>(
         converter: (store) => store.state.selectedId,
         builder: (context, id) {
           if (id.mId == widget.data.mId)

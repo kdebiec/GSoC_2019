@@ -6,8 +6,8 @@ import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/common/bottom_bar.dart';
 import 'package:retroshare/ui/person_delegate.dart';
 import 'package:retroshare/model/identity.dart';
-import 'package:retroshare/redux/model/identity_state.dart';
-import 'package:retroshare/redux/actions/identity_actions.dart';
+import 'package:retroshare/redux/model/app_state.dart';
+import 'package:retroshare/redux/actions/app_actions.dart';
 
 class ChangeIdentityScreen extends StatefulWidget {
   @override
@@ -16,7 +16,7 @@ class ChangeIdentityScreen extends StatefulWidget {
 
 class _ChangeIdentityScreenState extends State<ChangeIdentityScreen> {
   void _undoChangesOnExit(BuildContext context) {
-    final store = StoreProvider.of<IdentityState>(context);
+    final store = StoreProvider.of<AppState>(context);
     store.dispatch(ChangeSelectedIdentityAction(store.state.currId));
   }
 
@@ -65,7 +65,7 @@ class _ChangeIdentityScreenState extends State<ChangeIdentityScreen> {
                 ),
               ),
               Expanded(
-                child: StoreConnector<IdentityState,
+                child: StoreConnector<AppState,
                     Tuple2<List<Identity>, Identity>>(
                   converter: (store) =>
                       Tuple2(store.state.ownIdsList, store.state.selectedId),
@@ -82,7 +82,7 @@ class _ChangeIdentityScreenState extends State<ChangeIdentityScreen> {
                           isSelectable: true,
                           onPressed: () {
                             final store =
-                                StoreProvider.of<IdentityState>(context);
+                                StoreProvider.of<AppState>(context);
                             final id = idsTuple.item1[index];
                             store.dispatch(ChangeSelectedIdentityAction(id));
                           },
@@ -98,7 +98,7 @@ class _ChangeIdentityScreenState extends State<ChangeIdentityScreen> {
                     height: 2 * appBarHeight / 3,
                     child: FlatButton(
                       onPressed: () {
-                        final store = StoreProvider.of<IdentityState>(context);
+                        final store = StoreProvider.of<AppState>(context);
                         final id = store.state.selectedId;
                         store.dispatch(ChangeCurrentIdentityAction(id));
                         Navigator.pop(context);

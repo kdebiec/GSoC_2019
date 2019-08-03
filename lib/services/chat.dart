@@ -17,11 +17,11 @@ Future<List<Chat>> getChatLobbies() async {
   List<Chat> chatsList = List<Chat>();
 
   if (response.statusCode == 200) {
-    print(json.decode(response.body));
     json.decode(response.body)['public_lobbies'].forEach((chat) {
       if (chat != null)
         chatsList.add(Chat(
-            lobbyName: chat['lobby_name'],
+            chatId: chat['lobby_id'],
+            chatName: chat['lobby_name'],
             lobbyTopic: chat['lobby_topic'],
             numberOfParticipants: chat['total_number_of_peers']));
     });
@@ -30,6 +30,10 @@ Future<List<Chat>> getChatLobbies() async {
     throw Exception('Failed to load response');
   }
 }
+
+Future<List<Chat>> getSubscribedChatLobbies() async {
+  final response = await http.get(
+    'http://localhost:9092/rsMsgs/getChatLobbyList',
     headers: {
       HttpHeaders.authorizationHeader:
           'Basic ' + base64.encode(utf8.encode('$authToken'))

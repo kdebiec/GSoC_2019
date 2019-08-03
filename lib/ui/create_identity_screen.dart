@@ -8,8 +8,8 @@ import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/common/bottom_bar.dart';
 import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/services/identity.dart';
-import 'package:retroshare/redux/model/identity_state.dart';
-import 'package:retroshare/redux/actions/identity_actions.dart';
+import 'package:retroshare/redux/model/app_state.dart';
+import 'package:retroshare/redux/actions/app_actions.dart';
 
 class CreateIdentityScreen extends StatefulWidget {
   CreateIdentityScreen({Key key, this.isFirstId = false}) : super(key: key);
@@ -171,11 +171,11 @@ class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
                       onPressed: () async {
                         Identity id = await createIdentity(
                             Identity('', false, nameController.text));
-                        final store = StoreProvider.of<IdentityState>(context);
+                        final store = StoreProvider.of<AppState>(context);
                         store.dispatch(ChangeCurrentIdentityAction(id));
 
                         List<Identity> ownIdsList = await getOwnIdentities();
-                        store.dispatch(UpdateIdentitiesAction(ownIdsList));
+                        store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
 
                         if (widget.isFirstId)
                           Navigator.pushReplacementNamed(context, '/home');
