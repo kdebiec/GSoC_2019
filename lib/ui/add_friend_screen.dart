@@ -80,9 +80,6 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 SizedBox(
-                                  height: 20,
-                                ),
-                                SizedBox(
                                   width: double.infinity,
                                   child: Container(
                                     decoration: BoxDecoration(
