@@ -5,7 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/routes.dart';
 import 'package:retroshare/redux/store.dart';
-import 'package:retroshare/redux/model/identity_state.dart';
+import 'package:retroshare/redux/model/app_state.dart';
 
 void main() async {
   final identityStore = await createIdentityStore();
@@ -13,7 +13,7 @@ void main() async {
 }
 
 class App extends StatefulWidget {
-  final Store<IdentityState> identityStore;
+  final Store<AppState> identityStore;
 
   App(this.identityStore);
 
@@ -24,7 +24,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<IdentityState>(
+    return StoreProvider<AppState>(
       store: widget.identityStore,
       child: OKToast(
         child: MaterialApp(

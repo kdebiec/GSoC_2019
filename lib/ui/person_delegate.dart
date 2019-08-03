@@ -15,7 +15,8 @@ class PersonDelegateData {
       this.isOnline = false,
       this.isMessage = false,
       this.isUnread = false,
-      this.isTime = false});
+      this.isTime = false,
+      this.isRoom = false});
   final String name;
   final String mId;
   final String message;
@@ -25,6 +26,7 @@ class PersonDelegateData {
   final bool isMessage;
   final bool isUnread;
   final bool isTime;
+  final bool isRoom;
 }
 
 class PersonDelegate extends StatefulWidget {
@@ -137,18 +139,29 @@ class _PersonDelegateState extends State<PersonDelegate>
                       width: widget.data.isUnread
                           ? delegateHeight * 0.85
                           : delegateHeight * 0.8,
-                      decoration: BoxDecoration(
-                        border: widget.data.isUnread
-                            ? Border.all(
-                                color: Colors.white,
-                                width: delegateHeight * 0.03)
-                            : null,
-                        color: Colors.lightBlueAccent,
-                        borderRadius:
-                            BorderRadius.circular(delegateHeight * 0.8 * 0.33),
-                        image: DecorationImage(
-                          fit: BoxFit.fitWidth,
-                          image: AssetImage(widget.data.profileImage),
+                      decoration: widget.data.isRoom
+                          ? null
+                          : BoxDecoration(
+                              border: widget.data.isUnread
+                                  ? Border.all(
+                                      color: Colors.white,
+                                      width: delegateHeight * 0.03)
+                                  : null,
+                              color: Colors.lightBlueAccent,
+                              borderRadius: BorderRadius.circular(
+                                  delegateHeight * 0.8 * 0.33),
+                              image: DecorationImage(
+                                fit: BoxFit.fitWidth,
+                                image: AssetImage(widget.data.profileImage),
+                              ),
+                            ),
+                      child: Visibility(
+                        visible: widget.data.isRoom,
+                        child: Center(
+                          child: Icon(
+                            Icons.people,
+                            size: 40,
+                          ),
                         ),
                       ),
                     ),
