@@ -21,14 +21,99 @@ Future<List<Chat>> getChatLobbies() async {
     json.decode(response.body)['public_lobbies'].forEach((chat) {
       if (chat != null)
         chatsList.add(Chat(
-            chatId: chat['lobby_id'].toString(),
             lobbyName: chat['lobby_name'],
             lobbyTopic: chat['lobby_topic'],
-        numberOfParticipants: chat['total_number_of_peers']));
+            numberOfParticipants: chat['total_number_of_peers']));
     });
     return chatsList;
-    //return json.decode(response.body)['retval'];
   } else {
     throw Exception('Failed to load response');
   }
+}
+    headers: {
+      HttpHeaders.authorizationHeader:
+          'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+  );
+
+  List<Chat> chatsList = List<Chat>();
+
+  if (response.statusCode == 200) {
+    var list = json.decode(response.body)['cl_list'];
+    for (int i = 0; i < list.length; i++) {
+      Chat chatItem;
+      if (list[i] is int)
+        chatItem = await getChatLobbyInfo(list[i]);
+      else
+        chatItem = await getChatLobbyInfo(list[i].toInt());
+
+      chatsList.add(chatItem);
+    }
+
+    return chatsList;
+  } else
+    throw Exception('Failed to load response');
+}
+
+Future<Chat> getChatLobbyInfo(int lobbyId) async {
+  final response =
+      await http.post('http://localhost:9092/rsMsgs/getChatLobbyInfo',
+          headers: {
+            HttpHeaders.authorizationHeader:
+                'Basic ' + base64.encode(utf8.encode('$authToken'))
+          },
+          body: json.encode({'id': lobbyId}));
+
+  if (response.statusCode == 200) {
+    if (json.decode(response.body)['retval']) {
+      var chat = json.decode(response.body)['info'];
+      return Chat(
+          chatId: chat['lobby_id'],
+          chatName: chat['lobby_name'],
+          lobbyTopic: chat['lobby_topic'],
+          ownIdToUse: chat['gxs_id']);
+    } else
+      return Chat(
+          chatId: 0,
+          chatName: "Error",
+          lobbyTopic: "Couldn't load room details");
+  } else
+    throw Exception('Failed to load response');
+}
+
+Future<bool> joinChatLobby(int chatId, String idToUse) async {
+  final response = await http.post(
+    'http://localhost:9092/rsMsgs/joinVisibleChatLobby',
+    headers: {
+      HttpHeaders.authorizationHeader:
+          'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+    body: json.encode({'lobby_id': chatId, 'own_id': idToUse}),
+  );
+
+  if (response.statusCode == 200)
+    return json.decode(response.body)['retval'];
+  else
+    throw Exception('Failed to load response');
+}
+
+Future<bool> createChatLobby(
+    String lobbyName, String idToUse, String lobbyTopic) async {
+  final response = await http.post(
+    'http://localhost:9092/rsMsgs/createChatLobby',
+    headers: {
+      HttpHeaders.authorizationHeader:
+          'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+    body: json.encode({
+      'lobby_name': lobbyName,
+      'lobby_identity': idToUse,
+      'lobby_topic': lobbyTopic
+    }),
+  );
+
+  if (response.statusCode == 200)
+    return json.decode(response.body)['retval'];
+  else
+    throw Exception('Failed to load response');
 }
