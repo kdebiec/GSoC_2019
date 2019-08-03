@@ -1,6 +1,6 @@
 class Chat {
-  String chatId;
-  String lobbyName;
+  int chatId;
+  String chatName;
   String ownIdToUse;
   String lobbyTopic;
   bool isPublic;
@@ -8,7 +8,7 @@ class Chat {
 
   Chat(
       {this.chatId,
-      this.lobbyName,
+      this.chatName,
       this.lobbyTopic,
       this.ownIdToUse,
       this.isPublic,
