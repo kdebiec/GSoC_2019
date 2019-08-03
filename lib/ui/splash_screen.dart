@@ -5,8 +5,10 @@ import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/services/auth.dart';
 import 'package:retroshare/services/account.dart';
 import 'package:retroshare/services/identity.dart';
+import 'package:retroshare/services/chat.dart';
 import 'package:retroshare/model/account.dart';
 import 'package:retroshare/model/identity.dart';
+import 'package:retroshare/model/chat.dart';
 
 import 'package:retroshare/redux/model/app_state.dart';
 import 'package:retroshare/redux/actions/app_actions.dart';
@@ -57,8 +59,10 @@ void checkBackendState(BuildContext context) async {
     if (ownIdsList.isEmpty)
       Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
     else {
+      List<Chat> chatsList = await getSubscribedChatLobbies();
       final store = StoreProvider.of<AppState>(context);
       store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
+      store.dispatch(UpdateSubscribedChatsAction(chatsList));
       Navigator.pushReplacementNamed(context, '/home');
     }
   }
