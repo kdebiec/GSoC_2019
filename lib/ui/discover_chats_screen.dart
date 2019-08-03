@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/common/styles.dart';
 
 import 'package:retroshare/services/chat.dart';
 import 'package:retroshare/model/chat.dart';
+
+import 'package:retroshare/redux/model/app_state.dart';
 
 class DiscoverChatsScreen extends StatefulWidget {
   @override
@@ -20,11 +23,20 @@ class _DiscoverChatsScreenState extends State<DiscoverChatsScreen> {
   }
 
   void _getChats() async {
+    getSubscribedChatLobbies();
     _chatsList = await getChatLobbies();
     setState(() {});
   }
 
-  void _goToChat(String lobby_id) async {}
+  void _goToChat(int lobbyId) async {
+    final store = StoreProvider.of<AppState>(context);
+    bool success = await joinChatLobby(lobbyId, store.state.currId.mId);
+
+    if(success) {
+      Chat chat = await getChatLobbyInfo(lobbyId);
+      Navigator.pushNamed(context, '/room', arguments: {'isRoom': true, 'chatData': chat});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +93,7 @@ class _DiscoverChatsScreenState extends State<DiscoverChatsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text(
-                                    _chatsList[index].lobbyName,
+                                    _chatsList[index].chatName,
                                     style: Theme.of(context).textTheme.body2,
                                   ),
                                   Visibility(
