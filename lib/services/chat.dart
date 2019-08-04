@@ -18,12 +18,13 @@ Future<List<Chat>> getChatLobbies() async {
 
   if (response.statusCode == 200) {
     json.decode(response.body)['public_lobbies'].forEach((chat) {
-      if (chat != null)
+      if (chat != null && chat['lobby_flags'] != 0 && chat['lobby_flags'] != 4)
         chatsList.add(Chat(
-            chatId: chat['lobby_id'],
-            chatName: chat['lobby_name'],
-            lobbyTopic: chat['lobby_topic'],
-            numberOfParticipants: chat['total_number_of_peers']));
+          chatId: chat['lobby_id'].toInt(),
+          chatName: chat['lobby_name'],
+          lobbyTopic: chat['lobby_topic'],
+          numberOfParticipants: chat['total_number_of_peers'],
+        ));
     });
     return chatsList;
   } else {
@@ -46,10 +47,7 @@ Future<List<Chat>> getSubscribedChatLobbies() async {
     var list = json.decode(response.body)['cl_list'];
     for (int i = 0; i < list.length; i++) {
       Chat chatItem;
-      if (list[i] is int)
-        chatItem = await getChatLobbyInfo(list[i]);
-      else
-        chatItem = await getChatLobbyInfo(list[i].toInt());
+      chatItem = await getChatLobbyInfo(list[i].toInt());
 
       chatsList.add(chatItem);
     }
@@ -72,7 +70,7 @@ Future<Chat> getChatLobbyInfo(int lobbyId) async {
     if (json.decode(response.body)['retval']) {
       var chat = json.decode(response.body)['info'];
       return Chat(
-          chatId: chat['lobby_id'],
+          chatId: chat['lobby_id'].toInt(),
           chatName: chat['lobby_name'],
           lobbyTopic: chat['lobby_topic'],
           ownIdToUse: chat['gxs_id']);
@@ -121,3 +119,25 @@ Future<bool> createChatLobby(
   else
     throw Exception('Failed to load response');
 }
+
+Future<bool> sendMessage(int chatId, String msg) async {
+      'id': chatId,
+      'msg': msg,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print(json.decode(response.body));
+    return json.decode(response.body)['retval'];
+  } else
+    throw Exception('Failed to load response');
+}
+
+Future<List<Identity>> getLobbyParticipants(int lobbyId) async {
+  final response = await http.post(
+    'http://localhost:9092/rsMsgs/getChatLobbyInfo',
+    headers: {
+      HttpHeaders.authorizationHeader:
+      'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+    body: json.encode({
