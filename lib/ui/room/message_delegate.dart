@@ -1,25 +1,11 @@
 import 'package:flutter/material.dart';
 
-class MessageDelegateData {
-  const MessageDelegateData(
-      {this.name,
-      this.message,
-      this.time = '2 sec',
-      this.profileImage = 'assets/profile.jpg',
-      this.isOnline = true,
-      this.isSent = false});
-  final String name;
-  final String message;
-  final String time;
-  final String profileImage;
-  final bool isOnline;
-  final bool isSent;
-}
+import 'package:retroshare/model/chat.dart';
 
 class MessageDelegate extends StatelessWidget {
   const MessageDelegate({this.data});
 
-  final MessageDelegateData data;
+  final Message data;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +33,7 @@ class MessageDelegate extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
-                data.message,
+                data.msgContent,
                 style: TextStyle(
                   color: data.isSent ? Colors.white : Color(0xFF9E9E9E),
                 ),
