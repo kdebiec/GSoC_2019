@@ -74,7 +74,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
 
     _doneButtonController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 100));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
 
     _roomNameController.addListener(() {
       if (_isRoomCreation && _roomNameController.text.length > 2)
