@@ -32,6 +32,14 @@ class RouteGenerator {
       case '/launch_transition':
         return MaterialPageRoute(builder: (_) => LaunchTransitionScreen());
       case '/room':
+        if (args is Map) {
+          return MaterialPageRoute(
+            builder: (_) => RoomScreen(
+              isRoom: args['isRoom'],
+              chat: args['chatData'],
+            ),
+          );
+        }
         return MaterialPageRoute(builder: (_) => RoomScreen());
       case '/create_room':
         return MaterialPageRoute(builder: (_) => CreateRoomScreen());
