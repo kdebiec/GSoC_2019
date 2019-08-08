@@ -51,8 +51,6 @@ class _SignInScreenState extends State<SignInScreen> {
       if (isAuthTokenValid) {
         List<Identity> ownIdsList = await getOwnIdentities();
 
-        Navigator.pop(context);
-
         if (ownIdsList.isEmpty)
           Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
         else {
