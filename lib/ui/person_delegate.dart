@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'dart:convert';
 
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/model/identity.dart';
@@ -9,9 +10,9 @@ class PersonDelegateData {
   const PersonDelegateData(
       {this.name,
       this.mId,
-      this.message = 'Lorem ipsum dolor sit...',
-      this.time = '2 sec',
-      this.profileImage = 'assets/profile.jpg',
+      this.message = '',
+      this.time = '',
+      this.profileImage = '',
       this.isOnline = false,
       this.isMessage = false,
       this.isUnread = false,
@@ -139,7 +140,8 @@ class _PersonDelegateState extends State<PersonDelegate>
                       width: widget.data.isUnread
                           ? delegateHeight * 0.85
                           : delegateHeight * 0.8,
-                      decoration: widget.data.isRoom
+                      decoration: (widget.data.isRoom ||
+                              widget.data.profileImage.isEmpty)
                           ? null
                           : BoxDecoration(
                               border: widget.data.isUnread
@@ -147,19 +149,21 @@ class _PersonDelegateState extends State<PersonDelegate>
                                       color: Colors.white,
                                       width: delegateHeight * 0.03)
                                   : null,
-                              color: Colors.lightBlueAccent,
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(
                                   delegateHeight * 0.8 * 0.33),
                               image: DecorationImage(
                                 fit: BoxFit.fitWidth,
-                                image: AssetImage(widget.data.profileImage),
+                                image: MemoryImage(
+                                    base64.decode(widget.data.profileImage)),
                               ),
                             ),
                       child: Visibility(
-                        visible: widget.data.isRoom,
+                        visible: widget.data.isRoom ||
+                            widget.data.profileImage.isEmpty,
                         child: Center(
                           child: Icon(
-                            Icons.people,
+                            widget.data.isRoom ? Icons.people : Icons.person,
                             size: 40,
                           ),
                         ),

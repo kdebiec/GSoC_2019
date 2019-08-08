@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'dart:math' as math;
-import 'dart:ui' as ui;
+import 'dart:convert';
 
 import 'package:retroshare/common/button.dart';
 import 'package:retroshare/common/styles.dart';
@@ -323,18 +323,40 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                               Expanded(
                                 flex: 4,
                                 child: Center(
-                                  child: Container(
-                                    width: (heightOfTopBar - 40) * 0.65,
-                                    height: (heightOfTopBar - 40) * 0.65,
-                                    decoration: BoxDecoration(
-                                      color: Colors.lightBlueAccent,
-                                      borderRadius: BorderRadius.circular(
-                                          (heightOfTopBar - 40) * 0.8 * 0.5),
-                                      image: DecorationImage(
-                                        fit: BoxFit.fitWidth,
-                                        image: AssetImage('assets/profile.jpg'),
-                                      ),
-                                    ),
+                                  child: StoreConnector<AppState, String>(
+                                    converter: (store) =>
+                                        store.state.currId.avatar,
+                                    builder: (context, avatar) {
+                                      return Container(
+                                        width: (heightOfTopBar - 40) * 0.65,
+                                        height: (heightOfTopBar - 40) * 0.65,
+                                        decoration: avatar.isEmpty
+                                            ? null
+                                            : BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        (heightOfTopBar - 40) *
+                                                            0.65 *
+                                                            0.33),
+                                                image: DecorationImage(
+                                                  fit: BoxFit.fitWidth,
+                                                  image: MemoryImage(
+                                                      base64.decode(avatar)),
+                                                ),
+                                              ),
+                                        child: Visibility(
+                                          visible: avatar.isEmpty,
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.person,
+                                              size:
+                                                  (heightOfTopBar - 40) * 0.65,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
@@ -358,7 +380,8 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                                                     .body2
                                                     .color),
                                             onPressed: () {
-                                              Navigator.of(context).pushNamed('/add_friend');
+                                              Navigator.of(context)
+                                                  .pushNamed('/add_friend');
                                             },
                                           ),
                                         );
