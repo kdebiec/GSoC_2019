@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'dart:math' as math;
 import 'dart:convert';
 
 import 'package:retroshare/common/button.dart';
@@ -12,10 +11,17 @@ import 'package:retroshare/redux/model/app_state.dart';
 import 'package:retroshare/redux/actions/app_actions.dart';
 
 class TopBar extends StatefulWidget {
-  final ScrollController scrollController;
+  final double maxHeight;
+  final double minHeight;
+  final double panelAnimationValue;
   final TabController tabController;
 
-  TopBar({Key key, this.scrollController, this.tabController})
+  TopBar(
+      {Key key,
+      this.maxHeight,
+      this.minHeight,
+      this.panelAnimationValue,
+      this.tabController})
       : super(key: key);
 
   @override
@@ -31,30 +37,19 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
   Animation<double> _rightHeaderScaleAnimation;
 
   Animation<double> _headerFadeAnimation;
+  Animation<double> _nameHeaderFadeAnimation;
 
   AnimationController _animationController;
   CurvedAnimation _curvedAnimation;
+
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(vsync: this);
     _curvedAnimation =
-        CurvedAnimation(parent: _animationController, curve: Curves.easeOut);
+        CurvedAnimation(parent: _animationController, curve: Curves.easeInCubic);
 
-    widget.scrollController
-      ..addListener(() => setState(() {
-            if (widget.scrollController.offset >= 0 &&
-                widget.scrollController.offset <=
-                    (screenHeight - statusBarHeight) * 0.15 +
-                        4 * buttonHeight -
-                        statusBarHeight +
-                        50)
-              _animationController.value = 1 -
-                  (widget.scrollController.offset /
-                      ((screenHeight - statusBarHeight) * 0.15 +
-                          4 * buttonHeight -
-                          statusBarHeight));
-          }));
+    _animationController.value = getPanelAnimationValue;
 
     _leftHeaderFadeAnimation = Tween(
       begin: 1.0,
@@ -90,13 +85,22 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
       begin: 1.0,
       end: 0.0,
     ).animate(_curvedAnimation);
+
+    _nameHeaderFadeAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Interval(
+        0.5,
+        1.0,
+        curve: Curves.easeInCubic,
+      ),
+    ));
   }
 
-  double get _getOffset {
-    if (widget.scrollController.hasClients) {
-      return widget.scrollController.offset;
-    } else
-      return 0;
+  double get getPanelAnimationValue {
+    return widget.panelAnimationValue;
   }
 
   void _showDialog() {
@@ -208,190 +212,170 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
-    final double statusBarHeight = mediaQueryData.padding.top;
-    final double screenHeight = mediaQueryData.size.height;
-    final double appBarMinHeight = kAppBarMinHeight - statusBarHeight;
-    final double appBarMaxHeight = appBarMinHeight +
-        (screenHeight - statusBarHeight) * 0.15 +
-        4 * buttonHeight;
+    _animationController.value = getPanelAnimationValue;
 
-    double heightOfTopBar = _getOffset == null
-        ? appBarMinHeight
-        : appBarMinHeight +
-            math.sin((math.pi / 2) *
-                    ((appBarMaxHeight * 0.9 - _getOffset) /
-                        appBarMaxHeight *
-                        0.9)) *
-                appBarMaxHeight *
-                0.15 +
-            _curvedAnimation.value * 50;
+    double heightOfTopBar = widget.minHeight +
+        widget.panelAnimationValue *
+            (widget.maxHeight - 3 * buttonHeight - widget.minHeight - 20);
+
+    double heightOfNameHeader = 20 * _curvedAnimation.value;
 
     return Container(
       color: Colors.white,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          SizedBox(
-            height: statusBarHeight,
-          ),
-          Expanded(
+          Container(
+            height: widget.minHeight +
+                (widget.maxHeight - widget.minHeight) *
+                    widget.panelAnimationValue,
             child: Stack(
               children: <Widget>[
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            height: 1,
+                  child: Opacity(
+                    opacity: widget.panelAnimationValue,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          Visibility(
+                            visible: widget.panelAnimationValue == null
+                                ? false
+                                : widget.panelAnimationValue > 0.3,
+                            child: Button(
+                              name: 'Create new identity',
+                              buttonIcon: Icons.add,
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/create_identity');
+                              },
+                            ),
                           ),
-                        ),
-                        Visibility(
-                          visible: _getOffset == null
-                              ? false
-                              : _getOffset < appBarMaxHeight * 0.3,
-                          child: Button(
-                            name: 'Create new identity',
-                            buttonIcon: Icons.add,
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/create_identity');
-                            },
+                          Visibility(
+                            child: Button(
+                              name: 'Change identity',
+                              buttonIcon: Icons.visibility,
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/change_identity');
+                              },
+                            ),
                           ),
-                        ),
-                        Visibility(
-                          visible: _getOffset == null
-                              ? false
-                              : _getOffset < appBarMaxHeight * 0.4,
-                          child: Button(
-                            name: 'Change identity',
-                            buttonIcon: Icons.visibility,
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/change_identity');
-                            },
+                          Visibility(
+                            child: Button(
+                              name: 'Delete identity',
+                              buttonIcon: Icons.delete,
+                              onPressed: () {
+                                _showDialog();
+                              },
+                            ),
                           ),
-                        ),
-                        Visibility(
-                          visible: _getOffset == null
-                              ? false
-                              : _getOffset < appBarMaxHeight * 0.4,
-                          child: Button(
-                            name: 'Delete identity',
-                            buttonIcon: Icons.delete,
-                            onPressed: () {
-                              _showDialog();
-                            },
-                          ),
-                        ),
-                        Visibility(
-                          visible: _getOffset == null
-                              ? false
-                              : _getOffset < appBarMaxHeight * 0.7,
-                          child: Button(
-                            name: 'Options',
-                            buttonIcon: Icons.settings,
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/settings');
-                            },
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 Container(
-                  color: Colors.white,
-                  height: heightOfTopBar,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        blurRadius: 10,
+                        color: Color.fromRGBO(
+                            255, 255, 255, 1.0),
+                        spreadRadius: 15,
+                      )
+                    ],
+                  ),
+                  height: heightOfTopBar + heightOfNameHeader,
                   child: Center(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Expanded(
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 3,
-                                child: Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: AnimatedBuilder(
-                                    animation: widget.tabController.animation,
-                                    builder: getHeaderBuilder,
-                                  ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: AnimatedBuilder(
+                                  animation: widget.tabController.animation,
+                                  builder: getHeaderBuilder,
                                 ),
                               ),
-                              Expanded(
-                                flex: 4,
-                                child: Center(
-                                  child: StoreConnector<AppState, String>(
-                                    converter: (store) =>
-                                        store.state.currId.avatar,
-                                    builder: (context, avatar) {
-                                      return Container(
-                                        width: (heightOfTopBar - 40) * 0.65,
-                                        height: (heightOfTopBar - 40) * 0.65,
-                                        decoration: avatar.isEmpty
-                                            ? null
-                                            : BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        (heightOfTopBar - 40) *
-                                                            0.65 *
-                                                            0.33),
-                                                image: DecorationImage(
-                                                  fit: BoxFit.fitWidth,
-                                                  image: MemoryImage(
-                                                      base64.decode(avatar)),
-                                                ),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Center(
+                                child: StoreConnector<AppState, String>(
+                                  converter: (store) =>
+                                      store.state.currId.avatar,
+                                  builder: (context, avatar) {
+                                    return Container(
+                                      width: heightOfTopBar * 0.75,
+                                      height: heightOfTopBar * 0.75,
+                                      decoration: avatar.isEmpty
+                                          ? null
+                                          : BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      heightOfTopBar *
+                                                          0.75 *
+                                                          0.33),
+                                              image: DecorationImage(
+                                                fit: BoxFit.fitWidth,
+                                                image: MemoryImage(
+                                                    base64.decode(avatar)),
                                               ),
-                                        child: Visibility(
-                                          visible: avatar.isEmpty,
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.person,
-                                              size:
-                                                  (heightOfTopBar - 40) * 0.65,
                                             ),
+                                      child: Visibility(
+                                        visible: avatar.isEmpty,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.person,
+                                            size: heightOfTopBar * 0.75,
                                           ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: AnimatedBuilder(
+                                    animation: _curvedAnimation,
+                                    builder:
+                                        (BuildContext context, Widget widget) {
+                                      return FadeTransition(
+                                        opacity: _headerFadeAnimation,
+                                        child: IconButton(
+                                          icon: Icon(Icons.person_add,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .body2
+                                                  .color,
+                                              size: 30),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pushNamed('/add_friend');
+                                          },
                                         ),
                                       );
                                     },
                                   ),
                                 ),
                               ),
-                              Expanded(
-                                flex: 3,
-                                child: Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: AnimatedBuilder(
-                                      animation: _curvedAnimation,
-                                      builder: (BuildContext context,
-                                          Widget widget) {
-                                        return FadeTransition(
-                                          opacity: _headerFadeAnimation,
-                                          child: IconButton(
-                                            icon: Icon(Icons.person_add,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .body2
-                                                    .color),
-                                            onPressed: () {
-                                              Navigator.of(context)
-                                                  .pushNamed('/add_friend');
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         AnimatedBuilder(
                           animation: _curvedAnimation,
@@ -401,12 +385,12 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                               builder: (context, idName) {
                                 return Center(
                                   child: Container(
-                                    height: 50 * _curvedAnimation.value,
+                                    height: heightOfNameHeader * 2,
                                     child: Center(
                                       child: ScaleTransition(
                                         scale: _curvedAnimation,
                                         child: FadeTransition(
-                                          opacity: _curvedAnimation,
+                                          opacity: _nameHeaderFadeAnimation,
                                           child: Text(
                                             idName,
                                             style: Theme.of(context)
@@ -421,40 +405,6 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                               },
                             );
                           },
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Color(0xFFF5F5F5),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            height: 40,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(Icons.search,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .body1
-                                          .color),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Expanded(
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'Type text...'),
-                                      style: Theme.of(context).textTheme.body2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ),
                       ],
                     ),

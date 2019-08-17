@@ -12,9 +12,6 @@ class FriendsTab extends StatelessWidget {
       bottom: false,
       child: CustomScrollView(
         slivers: <Widget>[
-          SliverOverlapInjector(
-            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-          ),
           SliverPadding(
             padding:
                 const EdgeInsets.only(left: 8, top: 8, right: 16, bottom: 8),

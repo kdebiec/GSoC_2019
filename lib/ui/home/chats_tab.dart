@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:retroshare/ui/person_delegate.dart';
-import 'package:retroshare/model/home_tabs.dart';
 import 'package:retroshare/common/styles.dart';
 
 import 'package:retroshare/model/chat.dart';
@@ -16,9 +15,6 @@ class ChatsTab extends StatelessWidget {
       bottom: false,
       child: CustomScrollView(
         slivers: <Widget>[
-          SliverOverlapInjector(
-            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-          ),
           StoreConnector<AppState, List<Chat>>(
             converter: (store) => store.state.subscribedChats,
             builder: (context, chatsList) {
