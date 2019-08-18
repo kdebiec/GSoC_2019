@@ -523,32 +523,35 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
                     Visibility(
                       visible: true,
                       child: Center(
-                        child: SizedBox(
-                          width: 200,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Image.asset('assets/icons8/list-is-empty-3.png'),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                                child: Text(
-                                  'Looks like an empty space',
-                                  style: Theme.of(context).textTheme.body2,
-                                  textAlign: TextAlign.center,
+                        child: SingleChildScrollView(
+                          child: SizedBox(
+                            width: 200,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Image.asset(
+                                    'assets/icons8/list-is-empty-3.png'),
+                                SizedBox(
+                                  height: 20,
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                                child: Text(
-                                  'You can add friends in the menu',
-                                  style: Theme.of(context).textTheme.body1,
-                                  textAlign: TextAlign.center,
+                                Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5),
+                                  child: Text(
+                                    'Looks like an empty space',
+                                    style: Theme.of(context).textTheme.body2,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5),
+                                  child: Text(
+                                    'You can add friends in the menu',
+                                    style: Theme.of(context).textTheme.body1,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
