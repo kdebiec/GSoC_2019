@@ -67,31 +67,41 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         SizedBox(
           height: topBarMinHeight,
         ),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Color(0xFFF5F5F5),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          margin: EdgeInsets.symmetric(horizontal: 8),
-          height: 40,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.search,
-                    color: Theme.of(context).textTheme.body1.color),
-                SizedBox(
-                  width: 5,
+        Hero(
+          tag: 'search_box',
+          child: Material(
+            color: Colors.white,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/search');
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Color(0xFFF5F5F5),
                 ),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                        border: InputBorder.none, hintText: 'Type text...'),
-                    style: Theme.of(context).textTheme.body2,
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                height: 40,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.search,
+                          color: Theme.of(context).textTheme.body1.color),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Type text...',
+                          style: Theme.of(context).textTheme.body2.copyWith(color: Theme.of(context).hintColor),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
