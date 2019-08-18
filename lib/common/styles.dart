@@ -5,5 +5,5 @@ const double appBarHeight = 56.0;
 double screenHeight;
 double statusBarHeight;
 
-const double kAppBarMinHeight = 150.0;
+const double kAppBarMinHeight = 110.0;
 const double kAppBarMidHeight = 256.0;

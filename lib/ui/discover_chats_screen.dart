@@ -14,7 +14,7 @@ class DiscoverChatsScreen extends StatefulWidget {
 }
 
 class _DiscoverChatsScreenState extends State<DiscoverChatsScreen> {
-  List<Chat> _chatsList;
+  List<Chat> _chatsList = List();
 
   @override
   void initState() {
@@ -32,9 +32,10 @@ class _DiscoverChatsScreenState extends State<DiscoverChatsScreen> {
     final store = StoreProvider.of<AppState>(context);
     bool success = await joinChatLobby(lobbyId, store.state.currId.mId);
 
-    if(success) {
+    if (success) {
       Chat chat = await getChatLobbyInfo(lobbyId);
-      Navigator.pushNamed(context, '/room', arguments: {'isRoom': true, 'chatData': chat});
+      Navigator.pushNamed(context, '/room',
+          arguments: {'isRoom': true, 'chatData': chat});
     }
   }
 
@@ -73,61 +74,90 @@ class _DiscoverChatsScreenState extends State<DiscoverChatsScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(8),
-                itemCount: _chatsList == null ? 0 : _chatsList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      _goToChat(_chatsList[index].chatId);
-                    },
-                    child: Container(
-                      height: personDelegateHeight,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    _chatsList[index].chatName,
-                                    style: Theme.of(context).textTheme.body2,
+              child: Stack(
+                children: <Widget>[
+                  ListView.builder(
+                    padding: EdgeInsets.all(8),
+                    itemCount: _chatsList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () {
+                          _goToChat(_chatsList[index].chatId);
+                        },
+                        child: Container(
+                          height: personDelegateHeight,
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        _chatsList[index].chatName,
+                                        style:
+                                            Theme.of(context).textTheme.body2,
+                                      ),
+                                      Visibility(
+                                        visible: _chatsList[index]
+                                            .lobbyTopic
+                                            .isNotEmpty,
+                                        child: Text(
+                                          'Topic: ' +
+                                              _chatsList[index].lobbyTopic,
+                                          style:
+                                              Theme.of(context).textTheme.body1,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Number of participants: ' +
+                                            _chatsList[index]
+                                                .numberOfParticipants
+                                                .toString(),
+                                        style:
+                                            Theme.of(context).textTheme.body1,
+                                      ),
+                                    ],
                                   ),
-                                  Visibility(
-                                    visible:
-                                        _chatsList[index].lobbyTopic.isNotEmpty,
-                                    child: Text(
-                                      'Topic: ' + _chatsList[index].lobbyTopic,
-                                      style: Theme.of(context).textTheme.body1,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Number of participants: ' +
-                                        _chatsList[index]
-                                            .numberOfParticipants
-                                            .toString(),
-                                    style: Theme.of(context).textTheme.body1,
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
+                              Center(
+                                child: IconButton(
+                                  icon: Icon(Icons.input),
+                                  onPressed: () {
+                                    _goToChat(_chatsList[index].chatId);
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          Center(
-                            child: IconButton(
-                              icon: Icon(Icons.input),
-                              onPressed: () {
-                                _goToChat(_chatsList[index].chatId);
-                              },
+                        ),
+                      );
+                    },
+                  ),
+                  Visibility(
+                    visible: _chatsList.isEmpty,
+                    child: Center(
+                      child: SizedBox(
+                        width: 250,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Image.asset('assets/icons8/pluto-fatal-error.png'),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 25),
+                              child: Text('No public chats are available',
+                                  style: Theme.of(context).textTheme.body2),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
           ],

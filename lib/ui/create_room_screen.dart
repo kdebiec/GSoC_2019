@@ -450,72 +450,110 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.only(
-                      left: 8, top: 0, right: 16, bottom: 8),
-                  itemCount: personData.length + 1,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) {
-                      return AnimatedBuilder(
-                          animation: _animationController,
-                          builder: (BuildContext context, Widget widget) {
-                            return GestureDetector(
-                              onTap: () {
-                                _animationController.forward();
-                                setState(() {
-                                  _isRoomCreation = true;
-                                });
-                              },
-                              child: Container(
-                                color: Colors.white,
-                                height: _buttonHeightAnimation.value,
-                                child: FadeTransition(
-                                  opacity: _buttonFadeAnimation,
-                                  child: Row(
-                                    children: <Widget>[
-                                      Container(
-                                        height: _buttonHeightAnimation.value,
-                                        width: personDelegateHeight,
-                                        child: Center(
-                                          child: Icon(Icons.add,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .body2
-                                                  .color),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text('Create new room',
-                                                  style: Theme.of(context)
+                child: Stack(
+                  children: <Widget>[
+                    ListView.builder(
+                      padding: const EdgeInsets.only(
+                          left: 8, top: 0, right: 16, bottom: 8),
+                      itemCount: 1, //personData.length + 1,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == 0) {
+                          return AnimatedBuilder(
+                              animation: _animationController,
+                              builder: (BuildContext context, Widget widget) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    _animationController.forward();
+                                    setState(() {
+                                      _isRoomCreation = true;
+                                    });
+                                  },
+                                  child: Container(
+                                    color: Colors.white,
+                                    height: _buttonHeightAnimation.value,
+                                    child: FadeTransition(
+                                      opacity: _buttonFadeAnimation,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                            height:
+                                                _buttonHeightAnimation.value,
+                                            width: personDelegateHeight,
+                                            child: Center(
+                                              child: Icon(Icons.add,
+                                                  color: Theme.of(context)
                                                       .textTheme
-                                                      .body2),
-                                            ],
+                                                      .body2
+                                                      .color),
+                                            ),
                                           ),
-                                        ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 8),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Text('Create new room',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .body2),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
+                                );
+                              });
+                        }
+
+                        index -= 1;
+
+                        return PersonDelegate(
+                          data: personData[index],
+                        );
+                      },
+                    ),
+                    Visibility(
+                      visible: true,
+                      child: Center(
+                        child: SizedBox(
+                          width: 200,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Image.asset('assets/icons8/list-is-empty-3.png'),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                child: Text(
+                                  'Looks like an empty space',
+                                  style: Theme.of(context).textTheme.body2,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                            );
-                          });
-                    }
-
-                    index -= 1;
-
-                    return PersonDelegate(
-                      data: personData[index],
-                    );
-                  },
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                child: Text(
+                                  'You can add friends in the menu',
+                                  style: Theme.of(context).textTheme.body1,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               BottomBar(

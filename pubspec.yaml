@@ -56,6 +56,10 @@ flutter:
 
   assets:
     - assets/rs-logo.png
+    - assets/icons8/pluto-fatal-error.png
+    - assets/icons8/pluto-no-messages-1.png
+    - assets/icons8/pluto-sign-in.png
+    - assets/icons8/list-is-empty-3.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

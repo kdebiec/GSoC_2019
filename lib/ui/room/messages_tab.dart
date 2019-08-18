@@ -15,7 +15,7 @@ class MessagesTab extends StatefulWidget {
 }
 
 class _MessagesTabState extends State<MessagesTab> {
-  List<Message> msgList;
+  List<Message> msgList = List();
   TextEditingController msgController = TextEditingController();
 
   @override
@@ -29,15 +29,38 @@ class _MessagesTabState extends State<MessagesTab> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: ListView.builder(
-            reverse: true,
-            padding: const EdgeInsets.all(16.0),
-            itemCount: msgList == null ? 0 : msgList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return MessageDelegate(
-                data: msgList[index],
-              );
-            },
+          child: Stack(
+            children: <Widget>[
+              ListView.builder(
+                reverse: true,
+                padding: const EdgeInsets.all(16.0),
+                itemCount: msgList == null ? 0 : msgList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return MessageDelegate(
+                    data: msgList[index],
+                  );
+                },
+              ),
+              Visibility(
+                visible: msgList.isEmpty,
+                child: Center(
+                  child: SizedBox(
+                    width: 250,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset('assets/icons8/pluto-no-messages-1.png'),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 25),
+                          child: Text('It seems like there is no messages',
+                              style: Theme.of(context).textTheme.body2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         BottomBar(
