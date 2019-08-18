@@ -14,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   TabController _tabController;
+  PanelController _panelController;
 
   Animation<Color> _leftIconAnimation;
   Animation<Color> _rightIconAnimation;
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 2);
+    _panelController = PanelController();
 
     _leftIconAnimation =
         ColorTween(begin: Colors.lightBlueAccent, end: Colors.black12)
@@ -114,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final double appBarMinHeight = kAppBarMinHeight - statusBarHeight;
     final double appBarMaxHeight = appBarMinHeight +
         (screenHeight - statusBarHeight) * 0.15 +
-        3 * buttonHeight +
+        4 * buttonHeight +
         20;
 
     return Scaffold(
@@ -122,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         top: true,
         bottom: true,
         child: SlidingUpPanel(
+          controller: _panelController,
           maxHeight: appBarMaxHeight,
           minHeight: kAppBarMinHeight,
           parallaxEnabled: true,
@@ -132,6 +135,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             minHeight: kAppBarMinHeight,
             tabController: _tabController,
             panelAnimationValue: _animationController.value,
+            panelController: _panelController,
           ),
           slideDirection: SlideDirection.DOWN,
           backdropEnabled: true,
@@ -214,6 +218,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             GestureDetector(
+              onTap: _panelController.close,
               child: Opacity(
                 opacity: _animationController.value * 0.5,
                 child: Container(

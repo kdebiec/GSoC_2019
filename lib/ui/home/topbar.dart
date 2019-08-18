@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'dart:convert';
 
@@ -15,13 +16,15 @@ class TopBar extends StatefulWidget {
   final double minHeight;
   final double panelAnimationValue;
   final TabController tabController;
+  final PanelController panelController;
 
   TopBar(
       {Key key,
       this.maxHeight,
       this.minHeight,
       this.panelAnimationValue,
-      this.tabController})
+      this.tabController,
+      this.panelController})
       : super(key: key);
 
   @override
@@ -46,8 +49,8 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _animationController = AnimationController(vsync: this);
-    _curvedAnimation =
-        CurvedAnimation(parent: _animationController, curve: Curves.easeInCubic);
+    _curvedAnimation = CurvedAnimation(
+        parent: _animationController, curve: Curves.easeInCubic);
 
     _animationController.value = getPanelAnimationValue;
 
@@ -216,7 +219,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
 
     double heightOfTopBar = widget.minHeight +
         widget.panelAnimationValue *
-            (widget.maxHeight - 3 * buttonHeight - widget.minHeight - 20);
+            (widget.maxHeight - 4 * buttonHeight - widget.minHeight - 20);
 
     double heightOfNameHeader = 20 * _curvedAnimation.value;
 
@@ -240,6 +243,18 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
+                          Visibility(
+                            visible: widget.panelAnimationValue == null
+                                ? false
+                                : widget.panelAnimationValue > 0.4,
+                            child: Button(
+                              name: 'Add friend',
+                              buttonIcon: Icons.person_add,
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/add_friend');
+                              },
+                            ),
+                          ),
                           Visibility(
                             visible: widget.panelAnimationValue == null
                                 ? false
@@ -283,8 +298,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                     boxShadow: <BoxShadow>[
                       BoxShadow(
                         blurRadius: 10,
-                        color: Color.fromRGBO(
-                            255, 255, 255, 1.0),
+                        color: Color.fromRGBO(255, 255, 255, 1.0),
                         spreadRadius: 15,
                       )
                     ],
@@ -351,26 +365,14 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                                 child: Align(
                                   alignment: Alignment.centerRight,
-                                  child: AnimatedBuilder(
-                                    animation: _curvedAnimation,
-                                    builder:
-                                        (BuildContext context, Widget widget) {
-                                      return FadeTransition(
-                                        opacity: _headerFadeAnimation,
-                                        child: IconButton(
-                                          icon: Icon(Icons.person_add,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .body2
-                                                  .color,
-                                              size: 30),
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pushNamed('/add_friend');
-                                          },
-                                        ),
-                                      );
-                                    },
+                                  child: GestureDetector(
+                                    onTap: widget.panelController.isPanelOpen()
+                                        ? widget.panelController.close
+                                        : widget.panelController.open,
+                                    child: AnimatedIcon(
+                                        icon: AnimatedIcons.menu_close,
+                                        progress: _curvedAnimation,
+                                        size: 30),
                                   ),
                                 ),
                               ),
