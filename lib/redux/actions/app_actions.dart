@@ -31,6 +31,12 @@ class UpdateFriendsSignedIdentitiesAction {
   UpdateFriendsSignedIdentitiesAction(this.friendsSignedIdsList);
 }
 
+class UpdateAllIdentitiesAction {
+  final List<Identity> allIdsList;
+
+  UpdateAllIdentitiesAction(this.allIdsList);
+}
+
 class UpdateSubscribedChatsAction {
   final List<Chat> subscribedChats;
 

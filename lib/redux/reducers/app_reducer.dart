@@ -13,6 +13,8 @@ AppState identityStateReducers(AppState state, dynamic action) {
     return updateFriendsIdentities(state, action);
   else if (action is UpdateFriendsSignedIdentitiesAction)
     return updateFriendsSignedIdentities(state, action);
+  else if (action is UpdateAllIdentitiesAction)
+    return updateAllIdentitiesAction(state, action);
   else if (action is UpdateSubscribedChatsAction)
     return updateSubscribedChats(state, action);
 
@@ -21,8 +23,14 @@ AppState identityStateReducers(AppState state, dynamic action) {
 
 AppState changeCurrentIdentity(
     AppState state, ChangeCurrentIdentityAction action) {
-  return AppState(state.ownIdsList, action.identity, state.selectedId,
-      state.friendsIdsList, state.friendsSignedIdsList, state.subscribedChats);
+  return AppState(
+      state.ownIdsList,
+      action.identity,
+      state.selectedId,
+      state.friendsIdsList,
+      state.friendsSignedIdsList,
+      state.allIdsList,
+      state.subscribedChats);
 }
 
 AppState updateOwnIdentities(AppState state, UpdateOwnIdentitiesAction action) {
@@ -30,29 +38,65 @@ AppState updateOwnIdentities(AppState state, UpdateOwnIdentitiesAction action) {
       ? (action.ownIdsList == null ? null : action.ownIdsList.first)
       : state.currId;
   return AppState(action.ownIdsList, currId, currId, state.friendsIdsList,
-      state.friendsSignedIdsList, state.subscribedChats);
+      state.friendsSignedIdsList, state.allIdsList, state.subscribedChats);
 }
 
 AppState changeSelectedIdentity(
     AppState state, ChangeSelectedIdentityAction action) {
-  return AppState(state.ownIdsList, state.currId, action.identity,
-      state.friendsIdsList, state.friendsSignedIdsList, state.subscribedChats);
+  return AppState(
+      state.ownIdsList,
+      state.currId,
+      action.identity,
+      state.friendsIdsList,
+      state.friendsSignedIdsList,
+      state.allIdsList,
+      state.subscribedChats);
 }
 
 AppState updateFriendsIdentities(
     AppState state, UpdateFriendsIdentitiesAction action) {
-  return AppState(state.ownIdsList, state.currId, state.selectedId,
-      action.friendsIdsList, state.friendsSignedIdsList, state.subscribedChats);
+  return AppState(
+      state.ownIdsList,
+      state.currId,
+      state.selectedId,
+      action.friendsIdsList,
+      state.friendsSignedIdsList,
+      state.allIdsList,
+      state.subscribedChats);
 }
 
 AppState updateFriendsSignedIdentities(
     AppState state, UpdateFriendsSignedIdentitiesAction action) {
-  return AppState(state.ownIdsList, state.currId, state.selectedId,
-      state.friendsIdsList, action.friendsSignedIdsList, state.subscribedChats);
+  return AppState(
+      state.ownIdsList,
+      state.currId,
+      state.selectedId,
+      state.friendsIdsList,
+      action.friendsSignedIdsList,
+      state.allIdsList,
+      state.subscribedChats);
+}
+
+AppState updateAllIdentitiesAction(
+    AppState state, UpdateAllIdentitiesAction action) {
+  return AppState(
+      state.ownIdsList,
+      state.currId,
+      state.selectedId,
+      state.friendsIdsList,
+      state.friendsSignedIdsList,
+      action.allIdsList,
+      state.subscribedChats);
 }
 
 AppState updateSubscribedChats(
     AppState state, UpdateSubscribedChatsAction action) {
-  return AppState(state.ownIdsList, state.currId, state.selectedId,
-      state.friendsIdsList, state.friendsSignedIdsList, action.subscribedChats);
+  return AppState(
+      state.ownIdsList,
+      state.currId,
+      state.selectedId,
+      state.friendsIdsList,
+      state.friendsSignedIdsList,
+      state.allIdsList,
+      action.subscribedChats);
 }

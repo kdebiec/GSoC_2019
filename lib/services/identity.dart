@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tuple/tuple.dart';
 
 import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/model/auth.dart';
@@ -50,33 +51,61 @@ dynamic loadOwnIdentitiesDetails(List<Identity> ownIdsList) async {
           body: json.encode({'id': id.mId}),
           headers: {
             HttpHeaders.authorizationHeader:
-            'Basic ' + base64.encode(utf8.encode('$authToken'))
+                'Basic ' + base64.encode(utf8.encode('$authToken'))
           });
 
       if (response.statusCode == 200) {
         if (!json.decode(response.body)['retval']) {
-          success = false;
+          //success = false;
           break;
         }
 
         id.name = json.decode(response.body)['details']['mNickname'];
+        id.avatar = json.decode(response.body)['details']['mAvatar']['mData'];
       }
     }
-  } while(!success);
+  } while (!success);
 }
 
-Future<Identity> createIdentity(Identity identity) async {
+Future<Identity> getIdDetails(String id) async {
   final response = await http.post(
-      'http://localhost:9092/rsIdentity/createIdentity',
-      body: json.encode({'name': identity.name}),
+      'http://localhost:9092/rsIdentity/getIdDetails',
+      body: json.encode({'id': id}),
       headers: {
         HttpHeaders.authorizationHeader:
             'Basic ' + base64.encode(utf8.encode('$authToken'))
       });
 
   if (response.statusCode == 200) {
+    if (json.decode(response.body)['retval']) {
+      Identity identity = Identity(id);
+      identity.name = json.decode(response.body)['details']['mNickname'];
+      identity.avatar =
+          json.decode(response.body)['details']['mAvatar']['mData'];
+      identity.signed =
+          json.decode(response.body)['details']['mPgpId'] != '0000000000000000';
+      return identity;
+    }
+  } else
+    throw Exception('Failed to load response');
+}
+
+Future<Identity> createIdentity(Identity identity, int avatarSize) async {
+  final response =
+      await http.post('http://localhost:9092/rsIdentity/createIdentity',
+          body: json.encode({
+            'name': identity.name,
+            //'avatar': {'mData': identity.avatar}
+          }),
+          headers: {
+        HttpHeaders.authorizationHeader:
+            'Basic ' + base64.encode(utf8.encode('$authToken'))
+      });
+
+  if (response.statusCode == 200) {
     if (json.decode(response.body)['retval'])
-      return Identity(json.decode(response.body)['id'], identity.signed, identity.name);
+      return Identity(json.decode(response.body)['id'], identity.signed,
+          identity.name, identity.avatar);
     else
       return Identity('');
   } else
@@ -97,6 +126,73 @@ Future<bool> deleteIdentity(Identity identity) async {
       return true;
     else
       return false;
+  } else
+    throw Exception('Failed to load response');
+}
+
+// Identities that are not contacts do not have loaded avatars
+dynamic getAllIdentities() async {
+  final response = await http
+      .get('http://localhost:9092/rsIdentity/getIdentitiesSummaries', headers: {
+    HttpHeaders.authorizationHeader:
+        'Basic ' + base64.encode(utf8.encode('$authToken'))
+  });
+
+  if (response.statusCode == 200) {
+    List<String> ids = List();
+    json.decode(response.body)['ids'].forEach((id) {
+      ids.add(id['mGroupId']);
+    });
+
+    final response2 = await http.post(
+      'http://localhost:9092/rsIdentity/getIdentitiesInfo',
+      headers: {
+        HttpHeaders.authorizationHeader:
+            'Basic ' + base64.encode(utf8.encode('$authToken'))
+      },
+      body: json.encode({'ids': ids}),
+    );
+
+    List<Identity> notContactIds = List();
+    List<Identity> contactIds = List();
+    List<Identity> signedContactIds = List();
+
+    if (response2.statusCode == 200) {
+      var idsInfo = json.decode(response2.body)['idsInfo'];
+      for (var i = 0; i < idsInfo.length; i++) {
+        if (idsInfo[i]['mIsAContact']) {
+          Identity id = await getIdDetails(idsInfo[i]['mMeta']['mGroupId']);
+          contactIds.add(id);
+
+          if (id.signed) signedContactIds.add(id);
+        } else
+          notContactIds.add(Identity(
+              idsInfo[i]['mMeta']['mGroupId'],
+              idsInfo[i]['mPgpId'] != '0000000000000000',
+              idsInfo[i]['mMeta']['mGroupName'],
+              '',
+              false));
+      }
+
+      return Tuple3<List<Identity>, List<Identity>, List<Identity>>(
+          signedContactIds, contactIds, notContactIds);
+    }
+  } else
+    throw Exception('Failed to load response');
+}
+
+Future<bool> setContact(String id, bool makeContact) async {
+  final response = await http.post(
+    'http://localhost:9092/rsIdentity/setAsRegularContact',
+    headers: {
+      HttpHeaders.authorizationHeader:
+          'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+    body: json.encode({'id': id, 'isContact': makeContact}),
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body)['retval'];
   } else
     throw Exception('Failed to load response');
 }

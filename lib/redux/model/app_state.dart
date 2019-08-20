@@ -7,7 +7,15 @@ class AppState {
   final Identity selectedId;
   final List<Identity> friendsIdsList;
   final List<Identity> friendsSignedIdsList;
+  final List<Identity> allIdsList;
   final List<Chat> subscribedChats;
 
-  AppState([this.ownIdsList, this.currId, this.selectedId, this.friendsIdsList, this.friendsSignedIdsList, this.subscribedChats]);
+  AppState(
+      [this.ownIdsList,
+      this.currId,
+      this.selectedId,
+      this.friendsIdsList,
+      this.friendsSignedIdsList,
+      this.allIdsList,
+      this.subscribedChats]);
 }

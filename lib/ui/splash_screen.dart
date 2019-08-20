@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:tuple/tuple.dart';
 
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/services/auth.dart';
@@ -25,8 +26,7 @@ class _SplashState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    if (!widget.isLoading)
-      checkBackendState(context);
+    if (!widget.isLoading) checkBackendState(context);
   }
 
   @override
@@ -57,16 +57,22 @@ void checkBackendState(BuildContext context) async {
     List<Identity> ownIdsList = await getOwnIdentities();
 
     if (ownIdsList.isEmpty)
-      Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
+      Navigator.pushReplacementNamed(context, '/create_identity',
+          arguments: true);
     else {
       List<Chat> chatsList = await getSubscribedChatLobbies();
       final store = StoreProvider.of<AppState>(context);
       store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
       store.dispatch(UpdateSubscribedChatsAction(chatsList));
+      Tuple3<List<Identity>, List<Identity>, List<Identity>> tupleIds =
+          await getAllIdentities();
+      print('Hello');
+      store.dispatch(UpdateFriendsSignedIdentitiesAction(tupleIds.item1));
+      store.dispatch(UpdateFriendsIdentitiesAction(tupleIds.item2));
+      store.dispatch(UpdateAllIdentitiesAction(tupleIds.item3));
       Navigator.pushReplacementNamed(context, '/home');
     }
-  }
-  else {
+  } else {
     await getLocations();
     if (accountsList.isEmpty)
       Navigator.pushReplacementNamed(context, '/launch_transition');

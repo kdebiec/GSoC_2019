@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:tuple/tuple.dart';
 
 import 'package:retroshare/model/account.dart';
 import 'package:retroshare/model/identity.dart';
@@ -58,6 +59,11 @@ class _SignInScreenState extends State<SignInScreen> {
           final store = StoreProvider.of<AppState>(context);
           store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
           store.dispatch(UpdateSubscribedChatsAction(chatsList));
+          Tuple3<List<Identity>, List<Identity>, List<Identity>> tupleIds =
+          await getAllIdentities();
+          store.dispatch(UpdateFriendsSignedIdentitiesAction(tupleIds.item1));
+          store.dispatch(UpdateFriendsIdentitiesAction(tupleIds.item2));
+          store.dispatch(UpdateAllIdentitiesAction(tupleIds.item3));
           Navigator.pushReplacementNamed(context, '/home');
         }
       }

@@ -4,7 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/common/bottom_bar.dart';
 import 'package:retroshare/ui/person_delegate.dart';
-import 'package:retroshare/services/identity.dart';
+import 'package:retroshare/model/identity.dart';
 import 'package:retroshare/services/chat.dart';
 
 import 'package:retroshare/redux/model/app_state.dart';
@@ -450,113 +450,128 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
                 ),
               ),
               Expanded(
-                child: Stack(
-                  children: <Widget>[
-                    ListView.builder(
-                      padding: const EdgeInsets.only(
-                          left: 8, top: 0, right: 16, bottom: 8),
-                      itemCount: 1, //personData.length + 1,
-                      itemBuilder: (BuildContext context, int index) {
-                        if (index == 0) {
-                          return AnimatedBuilder(
-                              animation: _animationController,
-                              builder: (BuildContext context, Widget widget) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    _animationController.forward();
-                                    setState(() {
-                                      _isRoomCreation = true;
-                                    });
-                                  },
-                                  child: Container(
-                                    color: Colors.white,
-                                    height: _buttonHeightAnimation.value,
-                                    child: FadeTransition(
-                                      opacity: _buttonFadeAnimation,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Container(
-                                            height:
-                                                _buttonHeightAnimation.value,
-                                            width: personDelegateHeight,
-                                            child: Center(
-                                              child: Icon(Icons.add,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .body2
-                                                      .color),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Text('Create new room',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .body2),
-                                                ],
+                child: StoreConnector<AppState, List<Identity>>(
+                  converter: (store) => store.state.friendsSignedIdsList,
+                  builder: (context, friendsSignedIdsList) {
+                    return Stack(
+                      children: <Widget>[
+                        ListView.builder(
+                          padding: const EdgeInsets.only(
+                              left: 8, top: 0, right: 16, bottom: 8),
+                          itemCount: friendsSignedIdsList.length + 1,
+                          itemBuilder: (BuildContext context, int index) {
+                            if (index == 0) {
+                              return AnimatedBuilder(
+                                animation: _animationController,
+                                builder: (BuildContext context, Widget widget) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      _animationController.forward();
+                                      setState(() {
+                                        _isRoomCreation = true;
+                                      });
+                                    },
+                                    child: Container(
+                                      color: Colors.white,
+                                      height: _buttonHeightAnimation.value,
+                                      child: FadeTransition(
+                                        opacity: _buttonFadeAnimation,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Container(
+                                              height:
+                                                  _buttonHeightAnimation.value,
+                                              width: personDelegateHeight,
+                                              child: Center(
+                                                child: Icon(Icons.add,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .body2
+                                                        .color),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            Expanded(
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 8),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Text('Create new room',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .body2),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              });
-                        }
+                                  );
+                                },
+                              );
+                            }
 
-                        index -= 1;
+                            index -= 1;
 
-                        return PersonDelegate(
-                          data: personData[index],
-                        );
-                      },
-                    ),
-                    Visibility(
-                      visible: true,
-                      child: Center(
-                        child: SingleChildScrollView(
-                          child: SizedBox(
-                            width: 200,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Image.asset(
-                                    'assets/icons8/list-is-empty-3.png'),
-                                SizedBox(
-                                  height: 20,
+                            return PersonDelegate(
+                              data: PersonDelegateData(
+                                name: friendsSignedIdsList[index].name,
+                                mId: friendsSignedIdsList[index].mId,
+                                profileImage: friendsSignedIdsList[index].avatar,
+                              ),
+                              onPressed: () {},
+                            );
+                          },
+                        ),
+                        Visibility(
+                          visible: friendsSignedIdsList.isEmpty,
+                          child: Center(
+                            child: SingleChildScrollView(
+                              child: SizedBox(
+                                width: 200,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Image.asset(
+                                        'assets/icons8/list-is-empty-3.png'),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5),
+                                      child: Text(
+                                        'Looks like an empty space',
+                                        style:
+                                            Theme.of(context).textTheme.body2,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5),
+                                      child: Text(
+                                        'You can add friends in the menu',
+                                        style:
+                                            Theme.of(context).textTheme.body1,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 5),
-                                  child: Text(
-                                    'Looks like an empty space',
-                                    style: Theme.of(context).textTheme.body2,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 5),
-                                  child: Text(
-                                    'You can add friends in the menu',
-                                    style: Theme.of(context).textTheme.body1,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
+                      ],
+                    );
+                  },
                 ),
               ),
               BottomBar(
