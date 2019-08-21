@@ -44,18 +44,20 @@ class _MessagesTabState extends State<MessagesTab> {
               Visibility(
                 visible: msgList.isEmpty,
                 child: Center(
-                  child: SizedBox(
-                    width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('assets/icons8/pluto-no-messages-1.png'),
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 25),
-                          child: Text('It seems like there is no messages',
-                              style: Theme.of(context).textTheme.body2),
-                        ),
-                      ],
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      width: 250,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset('assets/icons8/pluto-no-messages-1.png'),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 25),
+                            child: Text('It seems like there is no messages',
+                                style: Theme.of(context).textTheme.body2),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

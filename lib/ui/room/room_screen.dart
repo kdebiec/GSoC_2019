@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/ui/room/messages_tab.dart';
@@ -18,15 +19,15 @@ class _RoomScreenState extends State<RoomScreen>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
 
-  final bool isOnline = true;
-  final String profileImage = 'assets/profile.jpg';
+  final bool isOnline = false;
 
   Animation<Color> _iconAnimation;
 
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(vsync: this, length: 2);
+    _tabController =
+        new TabController(vsync: this, length: widget.isRoom ? 2 : 1);
 
     _iconAnimation =
         ColorTween(begin: Colors.black, end: Colors.lightBlueAccent)
@@ -74,16 +75,19 @@ class _RoomScreenState extends State<RoomScreen>
                         children: <Widget>[
                           Center(
                             child: Container(
-                              height: appBarHeight * 0.8,
-                              width: appBarHeight * 0.8,
+                              height: appBarHeight * 0.70,
+                              width: appBarHeight * 0.70,
                               decoration: BoxDecoration(
                                 border: null,
                                 color: Colors.lightBlueAccent,
                                 borderRadius: BorderRadius.circular(
-                                    appBarHeight * 0.8 * 0.33),
+                                    appBarHeight * 0.70 * 0.33),
                                 image: DecorationImage(
                                   fit: BoxFit.fitWidth,
-                                  image: AssetImage(profileImage),
+                                  image: widget.chat.interlocutorId == null
+                                      ? MemoryImage(base64.decode(''))
+                                      : MemoryImage(base64.decode(
+                                          widget.chat.interlocutorId.avatar)),
                                 ),
                               ),
                             ),
@@ -91,8 +95,8 @@ class _RoomScreenState extends State<RoomScreen>
                           Visibility(
                             visible: isOnline,
                             child: Positioned(
-                              bottom: appBarHeight * 0.73,
-                              left: appBarHeight * 0.73,
+                              bottom: appBarHeight * 0.63,
+                              left: appBarHeight * 0.63,
                               child: Container(
                                 height: appBarHeight * 0.25,
                                 width: appBarHeight * 0.25,
@@ -114,24 +118,29 @@ class _RoomScreenState extends State<RoomScreen>
                   SizedBox(width: 8.0),
                   Expanded(
                     child: Text(
-                      widget.isRoom ? widget.chat.chatName : '',
+                      widget.isRoom
+                          ? widget.chat.chatName
+                          : widget.chat.interlocutorId.name,
                       style: Theme.of(context).textTheme.body2,
                     ),
                   ),
-                  AnimatedBuilder(
-                    animation: _tabController.animation,
-                    builder: (BuildContext context, Widget widget) {
-                      return IconButton(
-                        icon: Icon(
-                          Icons.people,
-                          size: 25,
-                        ),
-                        color: _iconAnimation.value,
-                        onPressed: () {
-                          _tabController.animateTo(1 - _tabController.index);
-                        },
-                      );
-                    },
+                  Visibility(
+                    visible: widget.isRoom,
+                    child: AnimatedBuilder(
+                      animation: _tabController.animation,
+                      builder: (BuildContext context, Widget widget) {
+                        return IconButton(
+                          icon: Icon(
+                            Icons.people,
+                            size: 25,
+                          ),
+                          color: _iconAnimation.value,
+                          onPressed: () {
+                            _tabController.animateTo(1 - _tabController.index);
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -139,12 +148,15 @@ class _RoomScreenState extends State<RoomScreen>
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                children: [
-                  MessagesTab(chat: widget.chat),
-                  RoomFriendsTab(chat: widget.chat),
-                ],
+                children:
+                    List<Widget>.generate(widget.isRoom ? 2 : 1, (int index) {
+                  if (index == 0)
+                    return MessagesTab(chat: widget.chat);
+                  else
+                    return RoomFriendsTab(chat: widget.chat);
+                }),
               ),
-            )
+            ),
           ],
         ),
       ),

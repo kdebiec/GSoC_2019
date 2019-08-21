@@ -4,6 +4,7 @@ import 'package:tuple/tuple.dart';
 
 import 'package:retroshare/ui/person_delegate.dart';
 import 'package:retroshare/model/identity.dart';
+import 'package:retroshare/model/chat.dart';
 import 'package:retroshare/services/identity.dart';
 import 'package:retroshare/common/styles.dart';
 
@@ -95,10 +96,18 @@ class _FriendsTabState extends State<FriendsTab> {
                                 profileImage: friendsIdsList[index].avatar,
                               ),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/room', arguments: {
-                                  'isRoom': false,
-                                  //'chatData': chatsList[index - 1]
-                                });
+                                Navigator.pushNamed(
+                                  context,
+                                  '/room',
+                                  arguments: {
+                                    'isRoom': false,
+                                    'chatData': Chat(
+                                      interlocutorId: friendsIdsList[index],
+                                      isPublic: false,
+                                      numberOfParticipants: 1,
+                                    ),
+                                  },
+                                );
                               },
                             ),
                           );

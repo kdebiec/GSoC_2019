@@ -1,7 +1,10 @@
+import 'package:retroshare/model/identity.dart';
+
 class Chat {
   int chatId;
   String chatName;
   String ownIdToUse;
+  Identity interlocutorId;
   String lobbyTopic;
   bool isPublic;
   int numberOfParticipants;
@@ -11,6 +14,7 @@ class Chat {
       this.chatName,
       this.lobbyTopic,
       this.ownIdToUse,
+      this.interlocutorId,
       this.isPublic,
       this.numberOfParticipants});
 }
