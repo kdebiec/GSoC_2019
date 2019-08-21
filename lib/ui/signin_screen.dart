@@ -53,14 +53,15 @@ class _SignInScreenState extends State<SignInScreen> {
         List<Identity> ownIdsList = await getOwnIdentities();
 
         if (ownIdsList.isEmpty)
-          Navigator.pushReplacementNamed(context, '/create_identity', arguments: true);
+          Navigator.pushReplacementNamed(context, '/create_identity',
+              arguments: true);
         else {
           List<Chat> chatsList = await getSubscribedChatLobbies();
           final store = StoreProvider.of<AppState>(context);
           store.dispatch(UpdateOwnIdentitiesAction(ownIdsList));
           store.dispatch(UpdateSubscribedChatsAction(chatsList));
           Tuple3<List<Identity>, List<Identity>, List<Identity>> tupleIds =
-          await getAllIdentities();
+              await getAllIdentities();
           store.dispatch(UpdateFriendsSignedIdentitiesAction(tupleIds.item1));
           store.dispatch(UpdateFriendsIdentitiesAction(tupleIds.item2));
           store.dispatch(UpdateAllIdentitiesAction(tupleIds.item3));

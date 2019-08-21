@@ -66,7 +66,6 @@ void checkBackendState(BuildContext context) async {
       store.dispatch(UpdateSubscribedChatsAction(chatsList));
       Tuple3<List<Identity>, List<Identity>, List<Identity>> tupleIds =
           await getAllIdentities();
-      print('Hello');
       store.dispatch(UpdateFriendsSignedIdentitiesAction(tupleIds.item1));
       store.dispatch(UpdateFriendsIdentitiesAction(tupleIds.item2));
       store.dispatch(UpdateAllIdentitiesAction(tupleIds.item3));

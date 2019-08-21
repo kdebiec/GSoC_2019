@@ -163,7 +163,6 @@ dynamic getAllIdentities() async {
         if (idsInfo[i]['mIsAContact']) {
           Identity id = await getIdDetails(idsInfo[i]['mMeta']['mGroupId']);
           contactIds.add(id);
-
           if (id.signed) signedContactIds.add(id);
         } else
           notContactIds.add(Identity(

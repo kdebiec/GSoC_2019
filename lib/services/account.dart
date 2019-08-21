@@ -22,8 +22,6 @@ Future<bool> getLocations() async {
       await http.get('http://localhost:9092/rsLoginHelper/getLocations');
 
   if (response.statusCode == 200) {
-    print(response.body);
-
     accountsList = new List();
     json.decode(response.body)['locations'].forEach((location) {
       if (location != null)
