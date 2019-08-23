@@ -51,7 +51,18 @@ class _SplashState extends State<SplashScreen> {
 }
 
 void checkBackendState(BuildContext context) async {
-  bool isLoggedIn = await checkLoggedIn();
+  bool connectedToBackend = true;
+  bool isLoggedIn;
+  do {
+    try {
+      isLoggedIn = await checkLoggedIn();
+      connectedToBackend = true;
+    }
+    catch (e) {
+      connectedToBackend = false;
+    }
+  } while(!connectedToBackend);
+
   bool isTokenValid = await isAuthTokenValid();
   if (isLoggedIn && isTokenValid) {
     List<Identity> ownIdsList = await getOwnIdentities();
