@@ -58,6 +58,9 @@ class RouteGenerator {
       case '/discover_chats':
         return MaterialPageRoute(builder: (_) => DiscoverChatsScreen());
       case '/search':
+        if (args is int)
+          return MaterialPageRoute(
+              builder: (_) => SearchScreen(initialTab: args));
         return MaterialPageRoute(builder: (_) => SearchScreen());
       case '/friends_locations':
         return MaterialPageRoute(builder: (_) => FriendsLocationsScreen());
