@@ -6,6 +6,7 @@ import 'package:tuple/tuple.dart';
 
 import 'package:retroshare/model/account.dart';
 import 'package:retroshare/model/auth.dart';
+import 'package:retroshare/model/location.dart';
 
 dynamic checkLoggedIn() async {
   final response =
@@ -80,7 +81,7 @@ Future<String> getOwnCert() async {
   final response = await http
       .get('http://localhost:9092/rsPeers/GetRetroshareInvite', headers: {
     HttpHeaders.authorizationHeader:
-    'Basic ' + base64.encode(utf8.encode('$authToken'))
+        'Basic ' + base64.encode(utf8.encode('$authToken'))
   });
 
   if (response.statusCode == 200) {
@@ -91,15 +92,65 @@ Future<String> getOwnCert() async {
 }
 
 Future<bool> addCert(String cert) async {
-  final response = await http
-      .post('http://localhost:9092/rsPeers/acceptInvite', headers: {
-    HttpHeaders.authorizationHeader:
-    'Basic ' + base64.encode(utf8.encode('$authToken'))
-  },
-  body: json.encode({'invite': cert}));
+  final response = await http.post(
+    'http://localhost:9092/rsPeers/acceptInvite',
+    headers: {
+      HttpHeaders.authorizationHeader:
+          'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+    body: json.encode({'invite': cert}),
+  );
 
   if (response.statusCode == 200) {
     return json.decode(response.body)['retval'];
+  } else {
+    throw Exception('Failed to load response');
+  }
+}
+
+Future<List<Location>> getFriendsAccounts() async {
+  final response = await http.get(
+    'http://localhost:9092/rsPeers/getFriendList',
+    headers: {
+      HttpHeaders.authorizationHeader:
+          'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+  );
+
+  if (response.statusCode == 200) {
+    var sslIds = json.decode(response.body)['sslIds'];
+    List<Location> locations = List();
+    for (int i = 0; i < sslIds.length; i++) {
+      locations.add(await getLocationsDetails(sslIds[i]));
+    }
+
+    return locations;
+  } else {
+    throw Exception('Failed to load response');
+  }
+}
+
+Future<Location> getLocationsDetails(String peerId) async {
+  final response = await http.post(
+    'http://localhost:9092/rsPeers/getPeerDetails',
+    headers: {
+      HttpHeaders.authorizationHeader:
+          'Basic ' + base64.encode(utf8.encode('$authToken'))
+    },
+    body: json.encode({'sslId': peerId}),
+  );
+
+  if (response.statusCode == 200) {
+    var det = json.decode(response.body)['det'];
+    return Location(
+      det['id'],
+      det['gpg_id'],
+      det['name'],
+      det['location'],
+      det['connectState'] != 0 &&
+          det['connectState'] != 2 &&
+          det['connectState'] != 3,
+    );
   } else {
     throw Exception('Failed to load response');
   }

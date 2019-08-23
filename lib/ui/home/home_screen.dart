@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final double appBarMinHeight = kAppBarMinHeight - statusBarHeight;
     final double appBarMaxHeight = appBarMinHeight +
         (screenHeight - statusBarHeight) * 0.15 +
-        4 * buttonHeight +
+        5 * buttonHeight +
         20;
 
     return Scaffold(

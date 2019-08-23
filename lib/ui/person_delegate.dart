@@ -135,10 +135,10 @@ class _PersonDelegateState extends State<PersonDelegate>
                   Center(
                     child: Container(
                       height: widget.data.isUnread
-                          ? delegateHeight * 0.85
+                          ? delegateHeight * 0.88
                           : delegateHeight * 0.8,
                       width: widget.data.isUnread
-                          ? delegateHeight * 0.85
+                          ? delegateHeight * 0.88
                           : delegateHeight * 0.8,
                       decoration: (widget.data.isRoom ||
                               widget.data.profileImage.isEmpty)
@@ -151,7 +151,7 @@ class _PersonDelegateState extends State<PersonDelegate>
                                   : null,
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(
-                                  delegateHeight * 0.8 * 0.33),
+                                  delegateHeight * 0.92 * 0.33),
                               image: DecorationImage(
                                 fit: BoxFit.fitWidth,
                                 image: MemoryImage(

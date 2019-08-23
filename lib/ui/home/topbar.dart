@@ -219,7 +219,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
 
     double heightOfTopBar = widget.minHeight +
         widget.panelAnimationValue *
-            (widget.maxHeight - 4 * buttonHeight - widget.minHeight - 20);
+            (widget.maxHeight - 5 * buttonHeight - widget.minHeight - 20);
 
     double heightOfNameHeader = 20 * _curvedAnimation.value;
 
@@ -246,7 +246,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                           Visibility(
                             visible: widget.panelAnimationValue == null
                                 ? false
-                                : widget.panelAnimationValue > 0.4,
+                                : widget.panelAnimationValue > 0.5,
                             child: Button(
                               name: 'Add friend',
                               buttonIcon: Icons.person_add,
@@ -258,7 +258,7 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                           Visibility(
                             visible: widget.panelAnimationValue == null
                                 ? false
-                                : widget.panelAnimationValue > 0.3,
+                                : widget.panelAnimationValue > 0.4,
                             child: Button(
                               name: 'Create new identity',
                               buttonIcon: Icons.add,
@@ -269,6 +269,9 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                             ),
                           ),
                           Visibility(
+                            visible: widget.panelAnimationValue == null
+                                ? false
+                                : widget.panelAnimationValue > 0.3,
                             child: Button(
                               name: 'Change identity',
                               buttonIcon: Icons.visibility,
@@ -284,6 +287,16 @@ class _TopBarState extends State<TopBar> with SingleTickerProviderStateMixin {
                               buttonIcon: Icons.delete,
                               onPressed: () {
                                 _showDialog();
+                              },
+                            ),
+                          ),
+                          Visibility(
+                            child: Button(
+                              name: 'Friends locations',
+                              buttonIcon: Icons.devices,
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/friends_locations');
                               },
                             ),
                           ),
