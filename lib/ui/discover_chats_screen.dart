@@ -23,7 +23,6 @@ class _DiscoverChatsScreenState extends State<DiscoverChatsScreen> {
   }
 
   void _getChats() async {
-    getSubscribedChatLobbies();
     _chatsList = await getUnsubscribedChatLobbies();
     setState(() {});
   }

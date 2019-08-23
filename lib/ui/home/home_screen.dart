@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             color: Colors.white,
             child: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/search');
+                Navigator.pushNamed(context, '/search', arguments: _tabController.index,);
               },
               child: Container(
                 decoration: BoxDecoration(

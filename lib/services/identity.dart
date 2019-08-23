@@ -181,6 +181,10 @@ dynamic getAllIdentities() async {
               false));
       }
 
+      notContactIds.sort((id1, id2) {
+        return id1.name.compareTo(id2.name);
+      });
+
       return Tuple3<List<Identity>, List<Identity>, List<Identity>>(
           signedContactIds, contactIds, notContactIds);
     }
