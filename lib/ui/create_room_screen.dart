@@ -162,9 +162,13 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
 
   void _createChat() async {
     final store = StoreProvider.of<AppState>(context);
-    if (_isRoomCreation)
-      createChatLobby(_roomNameController.text, store.state.currId.mId,
+    if (_isRoomCreation) {
+      bool success = await createChatLobby(_roomNameController.text, store.state.currId.mId,
           _roomTopicController.text);
+
+      if(success)
+        Navigator.pop(context);
+    }
   }
 
   @override
