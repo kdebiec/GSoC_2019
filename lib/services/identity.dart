@@ -67,7 +67,7 @@ dynamic loadOwnIdentitiesDetails(List<Identity> ownIdsList) async {
   } while (!success);
 }
 
-Future<Identity> getIdDetails(String id) async {
+Future<Tuple2<bool, Identity>> getIdDetails(String id) async {
   final response = await http.post(
       'http://localhost:9092/rsIdentity/getIdDetails',
       body: json.encode({'id': id}),
@@ -84,8 +84,9 @@ Future<Identity> getIdDetails(String id) async {
           json.decode(response.body)['details']['mAvatar']['mData'];
       identity.signed =
           json.decode(response.body)['details']['mPgpId'] != '0000000000000000';
-      return identity;
-    }
+      return Tuple2<bool, Identity>(true, identity);
+    } else
+      return Tuple2<bool, Identity>(false, Identity(''));
   } else
     throw Exception('Failed to load response');
 }
@@ -161,7 +162,14 @@ dynamic getAllIdentities() async {
       var idsInfo = json.decode(response2.body)['idsInfo'];
       for (var i = 0; i < idsInfo.length; i++) {
         if (idsInfo[i]['mIsAContact']) {
-          Identity id = await getIdDetails(idsInfo[i]['mMeta']['mGroupId']);
+          bool success = true;
+          Identity id;
+          do {
+            Tuple2<bool, Identity> tuple =
+                await getIdDetails(idsInfo[i]['mMeta']['mGroupId']);
+            success = tuple.item1;
+            id = tuple.item2;
+          } while (!success);
           contactIds.add(id);
           if (id.signed) signedContactIds.add(id);
         } else
