@@ -194,7 +194,7 @@ class _SearchScreenState extends State<SearchScreen>
                                         .body1
                                         .color),
                                 SizedBox(
-                                  width: 5,
+                                  width: 8,
                                 ),
                                 Expanded(
                                   child: TextField(

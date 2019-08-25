@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Icon(Icons.search,
                           color: Theme.of(context).textTheme.body1.color),
                       SizedBox(
-                        width: 5,
+                        width: 8,
                       ),
                       Expanded(
                         child: Text(
