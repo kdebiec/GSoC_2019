@@ -78,6 +78,7 @@ class _ChangeIdentityScreenState extends State<ChangeIdentityScreen> {
                           data: PersonDelegateData(
                             name: idsTuple.item1[index].name,
                             mId: idsTuple.item1[index].mId,
+                            profileImage: idsTuple.item1[index].avatar,
                           ),
                           isSelectable: true,
                           onPressed: () {

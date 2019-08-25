@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:retroshare/common/styles.dart';
 import 'package:retroshare/common/bottom_bar.dart';
@@ -22,6 +23,8 @@ class CreateIdentityScreen extends StatefulWidget {
 class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
   TextEditingController nameController = TextEditingController();
   File _image;
+  String _imageBase64 = '';
+  int _imageSize;
 
   @override
   void dispose() {
@@ -34,6 +37,8 @@ class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
 
     setState(() {
       _image = image;
+      _imageSize = image.readAsBytesSync().length;
+      _imageBase64 = base64.encode(image.readAsBytesSync());
     });
   }
 
@@ -110,14 +115,24 @@ class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
                                     child: Container(
                                       height: 300 * 0.7,
                                       width: 300 * 0.7,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                            300 * 0.7 * 0.33),
-                                        image: DecorationImage(
-                                          fit: BoxFit.fitWidth,
-                                          image: _image == null
-                                              ? AssetImage('assets/profile.jpg')
-                                              : FileImage(_image),
+                                      decoration: _image == null
+                                          ? null
+                                          : BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      300 * 0.7 * 0.33),
+                                              image: DecorationImage(
+                                                fit: BoxFit.fitWidth,
+                                                image: FileImage(_image),
+                                              ),
+                                            ),
+                                      child: Visibility(
+                                        visible: _imageBase64.isEmpty,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.person,
+                                            size: 300 * 0.7,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -169,8 +184,8 @@ class _CreateIdentityScreenState extends State<CreateIdentityScreen> {
                     height: 2 * appBarHeight / 3,
                     child: FlatButton(
                       onPressed: () async {
-                        Identity id = await createIdentity(
-                            Identity('', false, nameController.text));
+                        Identity id = await createIdentity(Identity(
+                            '', false, nameController.text, _imageBase64), _imageSize);
                         final store = StoreProvider.of<AppState>(context);
                         store.dispatch(ChangeCurrentIdentityAction(id));
 
