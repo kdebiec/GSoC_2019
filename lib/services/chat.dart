@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tuple/tuple.dart';
 
 import 'package:retroshare/model/auth.dart';
 import 'package:retroshare/model/chat.dart';
+import 'package:retroshare/model/identity.dart';
+import 'package:retroshare/services/identity.dart';
 
 Future<List<Chat>> getChatLobbies() async {
   final response = await http.get(
